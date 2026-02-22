@@ -7,16 +7,30 @@ export interface ExperticketConfig {
   isTest: boolean;
 }
 
-export interface CatalogItem {
-  Providers: Provider[];
-  Timestamp: string;
+export interface ApiResponse {
   Success: boolean;
+  ErrorMessage?: string;
+  ErrorCode?: number;
+}
+
+export interface Language {
+  Code: string;
+  EnglishName: string;
+  NativeName: string;
+}
+
+export interface LanguagesResponse extends ApiResponse {
+  AvailableLanguages: Language[];
 }
 
 export interface Provider {
   Id: string;
   Name: string;
   Description?: string;
+}
+
+export interface ProvidersResponse extends ApiResponse {
+  Providers: Provider[];
 }
 
 export interface Product {
@@ -28,57 +42,78 @@ export interface Product {
   Price?: number;
 }
 
-export interface Language {
-  Code: string;
-  EnglishName: string;
-  NativeName: string;
+export interface ProductBase {
+  Id: string;
+  Name: string;
+  Description?: string;
+  ProviderId: string;
+  Products: Product[];
 }
 
-export interface CapacityResponse {
+export interface CatalogResponse extends ApiResponse {
+  ProductBases: ProductBase[];
+  Timestamp: string;
+}
+
+export interface CapacityProduct {
+  ProductId: string;
+  Date: string;
+  AvailableCapacity: number;
+  Price?: number;
+  PriceMode?: number;
+}
+
+export interface CapacitySession {
+  SessionId: string;
+  Date: string;
+  AvailableCapacity: number;
+}
+
+export interface CapacityResponse extends ApiResponse {
   ProductBases: any[];
-  Products: {
-    ProductId: string;
-    Date: string;
-    AvailableCapacity: number;
-    Price?: number;
-    PriceMode?: number;
-  }[];
-  Sessions: {
-    SessionId: string;
-    Date: string;
-    AvailableCapacity: number;
-  }[];
+  Products: CapacityProduct[];
+  Sessions: CapacitySession[];
+}
+
+export interface RealTimePrice {
+  ProductId: string;
+  AccessDate: string;
+  Price: number;
   Success: boolean;
 }
 
-export interface RealTimePriceResponse {
-  ProductsRealTimePrices: {
-    ProductId: string;
-    AccessDate: string;
-    Price: number;
-    Success: boolean;
-  }[];
-  Success: boolean;
+export interface RealTimePriceResponse extends ApiResponse {
+  ProductsRealTimePrices: RealTimePrice[];
+}
+
+export interface ReservationProduct {
+  ProductId: string;
+  Quantity: number;
+  Tickets?: any[];
 }
 
 export interface ReservationRequest {
   ApiKey: string;
   IsTest: boolean;
   AccessDateTime: string;
-  Products: {
-    ProductId: string;
-    Quantity: number;
-    Tickets?: any[];
-  }[];
+  Products: ReservationProduct[];
   LanguageCode?: string;
 }
 
-export interface ReservationResponse {
+export interface ReservationResponse extends ApiResponse {
   ReservationId: string;
   MinutesToExpiry: number;
   TotalPrice: number;
-  Success: boolean;
-  ErrorMessage?: string;
+}
+
+export interface TransactionProduct {
+  ProductId: string;
+  ProductName: string;
+  ProviderId: string;
+  ProviderName: string;
+  Quantity: number;
+  UnitPrice: number;
+  TotalRetailPrice: number;
 }
 
 export interface Transaction {
@@ -86,16 +121,39 @@ export interface Transaction {
   AccessDateTime: string;
   TransactionDateTime: string;
   TotalRetailPrice: number;
+  TotalPrice?: number;
   Success: boolean;
-  Products: any[];
+  Products: TransactionProduct[];
+}
+
+export interface TransactionsResponse extends ApiResponse {
+  Transactions: Transaction[];
+  TotalCount: number;
 }
 
 export interface CancellationRequest {
-  ApiKey: string;
+  CancellationRequestId: string;
   SaleId: string;
   Reason: number;
   ReasonComments?: string;
+  Status: number;
+  StatusComments?: string;
+  CreatedDateTime: string;
   IsTest: boolean;
+}
+
+export interface CancellationRequestsResponse extends ApiResponse {
+  CancellationRequests: CancellationRequest[];
+  TotalCount: number;
+}
+
+export interface TransactionDocument {
+  LanguageCode: string;
+  SalesDocumentUrl: string;
+}
+
+export interface TransactionDocumentsResponse extends ApiResponse {
+  Documents: TransactionDocument[];
 }
 
 export enum CancellationReason {
