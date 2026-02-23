@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Provider, Product } from '../../types';
+import { Provider, Product, WizardState } from '../../types';
 
 interface ProductSelectionStepProps {
   providers: Provider[];
@@ -9,7 +9,7 @@ interface ProductSelectionStepProps {
   selectedProductId: string;
   accessDate: string;
   quantity: number;
-  onUpdate: (updates: any) => void;
+  onUpdate: (updates: Partial<WizardState>) => void;
 }
 
 const ProductSelectionStep: React.FC<ProductSelectionStepProps> = ({

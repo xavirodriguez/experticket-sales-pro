@@ -69,8 +69,13 @@ export interface CapacitySession {
   AvailableCapacity: number;
 }
 
+export interface CapacityProductBase {
+  ProductBaseId: string;
+  AvailableCapacity: number;
+}
+
 export interface CapacityResponse extends ApiResponse {
-  ProductBases: any[];
+  ProductBases: CapacityProductBase[];
   Products: CapacityProduct[];
   Sessions: CapacitySession[];
 }
@@ -86,10 +91,16 @@ export interface RealTimePriceResponse extends ApiResponse {
   ProductsRealTimePrices: RealTimePrice[];
 }
 
+export interface Ticket {
+  TicketId?: string;
+  Reference?: string;
+  ExternalReference?: string;
+}
+
 export interface ReservationProduct {
   ProductId: string;
   Quantity: number;
-  Tickets?: any[];
+  Tickets?: Ticket[];
 }
 
 export interface ReservationRequest {
@@ -163,4 +174,15 @@ export enum CancellationReason {
   ILLNESS = 4,
   MISMANAGEMENT = 5,
   INTEGRATION_ISSUES = 6
+}
+
+export interface WizardState {
+  step: number;
+  selectedProviderId: string;
+  selectedProductId: string;
+  accessDate: string;
+  quantity: number;
+  reservationId: string;
+  transactionId: string;
+  reservationExpiry: number;
 }
