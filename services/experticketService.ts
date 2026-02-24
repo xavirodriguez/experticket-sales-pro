@@ -23,56 +23,95 @@ export class ExperticketApiError extends Error {
 class ExperticketService {
   constructor(private readonly config: ExperticketConfig) {}
 
-  private async request<T extends ApiResponse>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `https://${this.config.baseUrl}${endpoint}`;
+  private buildUrl(endpoint: string, params: Record<string, string | number> = {}): URL {
+    const url = new URL(`https://${this.config.baseUrl}${endpoint}`);
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.append(key, String(value));
+    });
+    return url;
+  }
+
+  private async performFetch(url: URL, options: RequestInit): Promise<Response> {
     const headers = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       ...options.headers,
     };
+    return fetch(url.toString(), { ...options, headers });
+  }
 
+  private async parseResponse<T>(response: Response): Promise<T> {
     try {
-      const response = await fetch(url, { ...options, headers });
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok || (data.Success === false)) {
-        throw new ExperticketApiError(
-          data.ErrorMessage || `API Error: ${response.statusText}`,
-          data.ErrorCode
-        );
-      }
-
-      return data as T;
-    } catch (error) {
-      if (error instanceof ExperticketApiError) throw error;
-      throw new ExperticketApiError(error instanceof Error ? error.message : 'Unknown network error');
+      return await response.json();
+    } catch {
+      return {} as T;
     }
   }
 
+  private validateResponse(data: ApiResponse, response: Response): void {
+    if (!response.ok || data.Success === false) {
+      throw new ExperticketApiError(
+        data.ErrorMessage || `API Error: ${response.statusText}`,
+        data.ErrorCode
+      );
+    }
+  }
+
+  private async request<T extends ApiResponse>(
+    endpoint: string,
+    options: RequestInit = {},
+    params: Record<string, string | number> = {}
+  ): Promise<T> {
+    try {
+      const url = this.buildUrl(endpoint, params);
+      const response = await this.performFetch(url, options);
+      const data = await this.parseResponse<T>(response);
+
+      this.validateResponse(data, response);
+      return data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  private handleError(error: unknown): ExperticketApiError {
+    if (error instanceof ExperticketApiError) return error;
+    return new ExperticketApiError(
+      error instanceof Error ? error.message : 'Unknown network error'
+    );
+  }
+
   async getLanguages(): Promise<LanguagesResponse> {
-    return this.request<LanguagesResponse>(`/AvailableLanguages?PartnerId=${this.config.partnerId}`);
+    return this.request<LanguagesResponse>('/AvailableLanguages', {}, {
+      PartnerId: this.config.partnerId
+    });
   }
 
   async getProviders(): Promise<ProvidersResponse> {
-    return this.request<ProvidersResponse>(`/providers?PartnerId=${this.config.partnerId}&LanguageCode=${this.config.languageCode}`);
+    return this.request<ProvidersResponse>('/providers', {}, {
+      PartnerId: this.config.partnerId,
+      LanguageCode: this.config.languageCode
+    });
   }
 
   async getCatalog(): Promise<CatalogResponse> {
-    return this.request<CatalogResponse>(`/catalog?PartnerId=${this.config.partnerId}&LanguageCode=${this.config.languageCode}`);
+    return this.request<CatalogResponse>('/catalog', {}, {
+      PartnerId: this.config.partnerId,
+      LanguageCode: this.config.languageCode
+    });
   }
 
   async checkCapacity(productIds: string[], dates: string[]): Promise<CapacityResponse> {
-    const query = new URLSearchParams({
+    return this.request<CapacityResponse>('/availablecapacity', {}, {
       PartnerId: this.config.partnerId,
       ProductIds: productIds.join(','),
       Dates: dates.join(','),
       IncludePrices: 'true'
     });
-    return this.request<CapacityResponse>(`/availablecapacity?${query.toString()}`);
   }
 
   async getRealTimePrices(productIds: string[], startDate: string, endDate: string): Promise<RealTimePriceResponse> {
-    return this.request<RealTimePriceResponse>(`/RealTimePrices`, {
+    return this.request<RealTimePriceResponse>('/RealTimePrices', {
       method: 'POST',
       body: JSON.stringify({
         PartnerId: this.config.partnerId,
@@ -84,7 +123,7 @@ class ExperticketService {
   }
 
   async createReservation(payload: { AccessDateTime: string; Products: { ProductId: string; Quantity: number }[] }): Promise<ReservationResponse> {
-    return this.request<ReservationResponse>(`/reservation`, {
+    return this.request<ReservationResponse>('/reservation', {
       method: 'POST',
       body: JSON.stringify({
         ...payload,
@@ -95,7 +134,7 @@ class ExperticketService {
   }
 
   async createTransaction(reservationId: string, accessDate: string, products: { ProductId: string }[]): Promise<ApiResponse> {
-    return this.request<ApiResponse>(`/transaction`, {
+    return this.request<ApiResponse>('/transaction', {
       method: 'POST',
       body: JSON.stringify({
         ApiKey: this.config.apiKey,
@@ -108,23 +147,21 @@ class ExperticketService {
   }
 
   async getTransactions(params: Record<string, string | number> = {}): Promise<TransactionsResponse> {
-    const query = new URLSearchParams({
+    return this.request<TransactionsResponse>('/transaction', {}, {
       ApiKey: this.config.apiKey,
-      ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]))
+      ...params
     });
-    return this.request<TransactionsResponse>(`/transaction?${query.toString()}`);
   }
 
   async getCancellationRequests(params: Record<string, string | number> = {}): Promise<CancellationRequestsResponse> {
-    const query = new URLSearchParams({
+    return this.request<CancellationRequestsResponse>('/cancellationrequest', {}, {
       ApiKey: this.config.apiKey,
-      ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]))
+      ...params
     });
-    return this.request<CancellationRequestsResponse>(`/cancellationrequest?${query.toString()}`);
   }
 
   async submitCancellation(saleId: string, reason: number, comments: string = ''): Promise<ApiResponse> {
-    return this.request<ApiResponse>(`/cancellationrequest`, {
+    return this.request<ApiResponse>('/cancellationrequest', {
       method: 'POST',
       body: JSON.stringify({
         ApiKey: this.config.apiKey,
@@ -137,12 +174,11 @@ class ExperticketService {
   }
 
   async getTransactionDocuments(id: string): Promise<TransactionDocumentsResponse> {
-    const query = new URLSearchParams({
+    return this.request<TransactionDocumentsResponse>('/transactiondocuments', {}, {
       ApiKey: this.config.apiKey,
       id: id,
       IncludeTransactionDocumentsLanguages: 'true'
     });
-    return this.request<TransactionDocumentsResponse>(`/transactiondocuments?${query.toString()}`);
   }
 }
 
