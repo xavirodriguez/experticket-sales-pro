@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MessageCircle, Send, X, Bot, Sparkles } from 'lucide-react';
+import { Bot, Send, Sparkles, X } from 'lucide-react';
 import { useAssistant, AssistantMessage } from '../hooks/useAssistant';
 
 const Assistant: React.FC = () => {
@@ -17,13 +17,7 @@ const Assistant: React.FC = () => {
 
   return (
     <div className="relative">
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full hover:shadow-lg transition shadow-blue-100"
-      >
-        <Sparkles size={16} />
-        <span className="text-sm font-bold">AI Helper</span>
-      </button>
+      <ToggleButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 
       {isOpen && (
         <div className="fixed bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -41,6 +35,16 @@ const Assistant: React.FC = () => {
   );
 };
 
+const ToggleButton: React.FC<{ isOpen: boolean; onClick: () => void }> = ({ onClick }) => (
+  <button
+    onClick={onClick}
+    className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full hover:shadow-lg transition shadow-blue-100"
+  >
+    <Sparkles size={16} />
+    <span className="text-sm font-bold">AI Helper</span>
+  </button>
+);
+
 const AssistantHeader: React.FC<{ onClose: () => void }> = ({ onClose }) => (
   <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex items-center justify-between text-white">
     <div className="flex items-center space-x-2">
@@ -56,16 +60,20 @@ const AssistantHeader: React.FC<{ onClose: () => void }> = ({ onClose }) => (
 const AssistantMessages: React.FC<{ messages: AssistantMessage[]; isLoading: boolean }> = ({ messages, isLoading }) => (
   <div className="h-96 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
     {messages.map((m, idx) => (
-      <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-        <div className={`
-          max-w-[80%] p-3 rounded-2xl text-sm
-          ${m.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none shadow-sm'}
-        `}>
-          {m.text}
-        </div>
-      </div>
+      <MessageBubble key={idx} message={m} />
     ))}
     {isLoading && <LoadingBubble />}
+  </div>
+);
+
+const MessageBubble: React.FC<{ message: AssistantMessage }> = ({ message }) => (
+  <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+    <div className={`
+      max-w-[80%] p-3 rounded-2xl text-sm
+      ${message.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none shadow-sm'}
+    `}>
+      {message.text}
+    </div>
   </div>
 );
 

@@ -9,48 +9,55 @@ export interface AssistantMessage {
 
 const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Experticket platform. You help agents understand ticketing terminology, provider rules, and the sales flow (Capacity -> Price -> Reservation -> Transaction). Keep answers professional, concise, and helpful.";
 
+const getApiKey = (): string | undefined => {
+  return (import.meta as any).env.VITE_GEMINI_API_KEY ||
+         (process.env as any).GEMINI_API_KEY ||
+         (process.env as any).API_KEY;
+};
+
+const fetchAIResponse = async (prompt: string, apiKey: string): Promise<string> => {
+  const genAI = new GoogleGenAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    systemInstruction: SYSTEM_INSTRUCTION
+  });
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  return response.text();
+};
+
 export const useAssistant = () => {
   const [messages, setMessages] = useState<AssistantMessage[]>([
     { role: 'bot', text: 'Hello! I am your Sales Assistant. How can I help you with Experticket bookings today?' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const sendMessage = useCallback(async (prompt: string) => {
-    const apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY || (process.env as any).GEMINI_API_KEY || (process.env as any).API_KEY;
+  const appendMessage = useCallback((role: 'user' | 'bot', text: string) => {
+    setMessages(prev => [...prev, { role, text }]);
+  }, []);
 
-    if (!prompt.trim() || !apiKey) {
-      if (!apiKey) {
-        setMessages(prev => [...prev, { role: 'bot', text: "API Key not configured. Please check your settings." }]);
-      }
+  const sendMessage = useCallback(async (prompt: string) => {
+    const apiKey = getApiKey();
+    if (!prompt.trim()) return;
+
+    if (!apiKey) {
+      appendMessage('bot', "API Key not configured. Please check your settings.");
       return;
     }
 
-    setMessages(prev => [...prev, { role: 'user', text: prompt }]);
+    appendMessage('user', prompt);
     setIsLoading(true);
 
     try {
-      const genAI = new GoogleGenAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
-        systemInstruction: SYSTEM_INSTRUCTION
-      });
-
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-
-      setMessages(prev => [...prev, { role: 'bot', text: text || "I'm sorry, I couldn't generate a response." }]);
+      const text = await fetchAIResponse(prompt, apiKey);
+      appendMessage('bot', text || "I'm sorry, I couldn't generate a response.");
     } catch (err) {
-      console.error('AI Assistant Error:', err);
-      setMessages(prev => [...prev, { role: 'bot', text: "Error connecting to AI service. Please check your configuration." }]);
+      appendMessage('bot', "Error connecting to AI service. Please check your configuration.");
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [appendMessage]);
 
-  return {
-    messages,
-    isLoading,
-    sendMessage
-  };
+  return { messages, isLoading, sendMessage };
 };
