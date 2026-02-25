@@ -41,19 +41,19 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     try {
       await action();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
   }, []);
 
   const loadCatalogData = useCallback(async () => {
-    const [provRes, catRes] = await Promise.all([
+    const [providersResponse, catalogResponse] = await Promise.all([
       service.getProviders(),
       service.getCatalog()
     ]);
-    setProviders(provRes.Providers || []);
-    setCatalog(catRes);
+    setProviders(providersResponse.Providers || []);
+    setCatalog(catalogResponse);
   }, [service]);
 
   useEffect(() => {
@@ -61,20 +61,20 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
   }, [executeAction, loadCatalogData]);
 
   const performCapacityCheck = useCallback(async () => {
-    const res = await service.checkCapacity([state.selectedProductId], [state.accessDate]);
-    setCapacityInfo(res);
+    const response = await service.checkCapacity([state.selectedProductId], [state.accessDate]);
+    setCapacityInfo(response);
   }, [service, state.selectedProductId, state.accessDate]);
 
   const performReservation = useCallback(async () => {
-    const res = await service.createReservation({
+    const response = await service.createReservation({
       AccessDateTime: state.accessDate,
       Products: [{ ProductId: state.selectedProductId, Quantity: state.quantity }]
     });
-    setState(s => ({
-      ...s,
+    setState(prevState => ({
+      ...prevState,
       step: 3,
-      reservationId: res.ReservationId,
-      reservationExpiry: res.MinutesToExpiry
+      reservationId: response.ReservationId,
+      reservationExpiry: response.MinutesToExpiry
     }));
   }, [service, state.accessDate, state.selectedProductId, state.quantity]);
 
@@ -84,34 +84,44 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
       state.accessDate,
       [{ ProductId: state.selectedProductId }]
     );
-    setState(s => ({ ...s, step: 4 }));
+    setState(prevState => ({ ...prevState, step: 4 }));
   }, [service, state.reservationId, state.accessDate, state.selectedProductId]);
 
   const handleStepSelection = useCallback(async () => {
-    if (!state.selectedProductId) throw new Error('Please select a product');
-    setState(s => ({ ...s, step: 2 }));
+    if (!state.selectedProductId) {
+      throw new Error('Please select a product');
+    }
+    setState(prevState => ({ ...prevState, step: 2 }));
     await performCapacityCheck();
   }, [state.selectedProductId, performCapacityCheck]);
 
   const goToNextStep = useCallback(() => executeAction(async () => {
-    if (state.step === 1) await handleStepSelection();
-    if (state.step === 2) await performReservation();
-    if (state.step === 3) await performTransaction();
+    const stepActions: Record<number, () => Promise<void>> = {
+      1: handleStepSelection,
+      2: performReservation,
+      3: performTransaction,
+    };
+
+    const action = stepActions[state.step];
+    if (action) {
+      await action();
+    }
   }), [state.step, executeAction, handleStepSelection, performReservation, performTransaction]);
 
   const goToPreviousStep = useCallback(() => {
-    setState(s => ({ ...s, step: s.step - 1 }));
+    setState(prevState => ({ ...prevState, step: prevState.step - 1 }));
   }, []);
 
   const resetWizard = useCallback(() => setState(INITIAL_STATE), []);
 
   const updateState = useCallback((updates: Partial<WizardState>) => {
-    setState(s => ({ ...s, ...updates }));
+    setState(prevState => ({ ...prevState, ...updates }));
   }, []);
 
   const filteredProducts = useMemo((): Product[] => {
-    const products = catalog?.ProductBases?.flatMap(pb => pb.Products || []) || [];
-    return products.filter(p => p.ProviderId === state.selectedProviderId);
+    const productBases = catalog?.ProductBases || [];
+    const allProducts = productBases.flatMap(pb => pb.Products || []);
+    return allProducts.filter(p => p.ProviderId === state.selectedProviderId);
   }, [catalog, state.selectedProviderId]);
 
   return {
