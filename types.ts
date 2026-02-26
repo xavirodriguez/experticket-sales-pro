@@ -164,3 +164,14 @@ export enum CancellationReason {
   MISMANAGEMENT = 5,
   INTEGRATION_ISSUES = 6
 }
+
+export interface WizardState {
+  step: number;
+  selectedProviderId: string;
+  selectedProductId: string;
+  accessDate: string;
+  quantity: number;
+  reservationId: string;
+  transactionId: string;
+  reservationExpiry: number;
+}
