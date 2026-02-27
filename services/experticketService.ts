@@ -46,8 +46,8 @@ class ExperticketService {
   async checkCapacity(productIds: string[], dates: string[]): Promise<CapacityResponse> {
     return this.request<CapacityResponse>('/availablecapacity', {}, {
       PartnerId: this.config.partnerId,
-      ProductIds: productIds.join(','),
-      Dates: dates.join(','),
+      ProductIds: this.formatCommaSeparatedList(productIds),
+      Dates: this.formatCommaSeparatedList(dates),
       IncludePrices: 'true'
     });
   }
@@ -64,27 +64,19 @@ class ExperticketService {
     });
   }
 
-  async createReservation(payload: { AccessDateTime: string; Products: { ProductId: string; Quantity: number }[] }): Promise<ReservationResponse> {
+  async createReservation(details: { AccessDateTime: string; Products: { ProductId: string; Quantity: number }[] }): Promise<ReservationResponse> {
+    const payload = this.buildReservationPayload(details);
     return this.request<ReservationResponse>('/reservation', {
       method: 'POST',
-      body: JSON.stringify({
-        ...payload,
-        ApiKey: this.config.apiKey,
-        IsTest: this.config.isTest
-      })
+      body: JSON.stringify(payload)
     });
   }
 
-  async createTransaction(reservationId: string, accessDate: string, products: { ProductId: string }[]): Promise<ApiResponse> {
+  async createTransaction(params: { reservationId: string; accessDate: string; products: { ProductId: string }[] }): Promise<ApiResponse> {
+    const payload = this.buildTransactionPayload(params);
     return this.request<ApiResponse>('/transaction', {
       method: 'POST',
-      body: JSON.stringify({
-        ApiKey: this.config.apiKey,
-        ReservationId: reservationId,
-        AccessDateTime: accessDate,
-        Products: products,
-        IsTest: this.config.isTest
-      })
+      body: JSON.stringify(payload)
     });
   }
 
@@ -138,6 +130,28 @@ class ExperticketService {
     } catch (error) {
       throw this.handleError(error);
     }
+  }
+
+  private buildReservationPayload(data: { AccessDateTime: string; Products: { ProductId: string; Quantity: number }[] }) {
+    return {
+      ...data,
+      ApiKey: this.config.apiKey,
+      IsTest: this.config.isTest
+    };
+  }
+
+  private formatCommaSeparatedList(items: string[]): string {
+    return items.join(',');
+  }
+
+  private buildTransactionPayload(reservationId: string, accessDate: string, products: { ProductId: string }[]) {
+    return {
+      ApiKey: this.config.apiKey,
+      ReservationId: reservationId,
+      AccessDateTime: accessDate,
+      Products: products,
+      IsTest: this.config.isTest
+    };
   }
 
   private buildUrl(endpoint: string, params: Record<string, string | number>): URL {
