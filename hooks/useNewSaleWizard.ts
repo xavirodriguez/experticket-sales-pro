@@ -1,18 +1,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ExperticketConfig, Provider, CatalogResponse, CapacityResponse, Product } from '../types';
+import { ExperticketConfig, Provider, CatalogResponse, CapacityResponse, Product, WizardState } from '../types';
 import ExperticketService from '../services/experticketService';
-
-export interface WizardState {
-  step: number;
-  selectedProviderId: string;
-  selectedProductId: string;
-  accessDate: string;
-  quantity: number;
-  reservationId: string;
-  transactionId: string;
-  reservationExpiry: number;
-}
 
 const INITIAL_STATE: WizardState = {
   step: 1,
@@ -41,13 +30,13 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     try {
       await action();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const loadCatalogData = useCallback(async () => {
+  const loadInitialData = useCallback(async () => {
     const [provRes, catRes] = await Promise.all([
       service.getProviders(),
       service.getCatalog()
@@ -57,15 +46,18 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
   }, [service]);
 
   useEffect(() => {
-    executeAction(loadCatalogData);
-  }, [executeAction, loadCatalogData]);
+    executeAction(loadInitialData);
+  }, [executeAction, loadInitialData]);
 
-  const performCapacityCheck = useCallback(async () => {
-    const res = await service.checkCapacity([state.selectedProductId], [state.accessDate]);
-    setCapacityInfo(res);
+  const handleProductSelection = useCallback(async () => {
+    if (!state.selectedProductId) throw new Error('Please select a product');
+
+    const capacity = await service.checkCapacity([state.selectedProductId], [state.accessDate]);
+    setCapacityInfo(capacity);
+    setState(s => ({ ...s, step: 2 }));
   }, [service, state.selectedProductId, state.accessDate]);
 
-  const performReservation = useCallback(async () => {
+  const handleReservation = useCallback(async () => {
     const res = await service.createReservation({
       AccessDateTime: state.accessDate,
       Products: [{ ProductId: state.selectedProductId, Quantity: state.quantity }]
@@ -78,7 +70,7 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     }));
   }, [service, state.accessDate, state.selectedProductId, state.quantity]);
 
-  const performTransaction = useCallback(async () => {
+  const handleTransaction = useCallback(async () => {
     await service.createTransaction(
       state.reservationId,
       state.accessDate,
@@ -87,20 +79,19 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     setState(s => ({ ...s, step: 4 }));
   }, [service, state.reservationId, state.accessDate, state.selectedProductId]);
 
-  const handleStepSelection = useCallback(async () => {
-    if (!state.selectedProductId) throw new Error('Please select a product');
-    setState(s => ({ ...s, step: 2 }));
-    await performCapacityCheck();
-  }, [state.selectedProductId, performCapacityCheck]);
-
   const goToNextStep = useCallback(() => executeAction(async () => {
-    if (state.step === 1) await handleStepSelection();
-    if (state.step === 2) await performReservation();
-    if (state.step === 3) await performTransaction();
-  }), [state.step, executeAction, handleStepSelection, performReservation, performTransaction]);
+    const stepActions: Record<number, () => Promise<void>> = {
+      1: handleProductSelection,
+      2: handleReservation,
+      3: handleTransaction
+    };
+
+    const action = stepActions[state.step];
+    if (action) await action();
+  }), [state.step, executeAction, handleProductSelection, handleReservation, handleTransaction]);
 
   const goToPreviousStep = useCallback(() => {
-    setState(s => ({ ...s, step: s.step - 1 }));
+    setState(s => ({ ...s, step: Math.max(1, s.step - 1) }));
   }, []);
 
   const resetWizard = useCallback(() => setState(INITIAL_STATE), []);
