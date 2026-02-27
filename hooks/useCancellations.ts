@@ -29,8 +29,6 @@ export const useCancellations = (config: ExperticketConfig) => {
       setIsSubmitting(true);
       await service.submitCancellation(saleId, reason, comments);
       await fetchRequests();
-    } catch (err) {
-      throw err;
     } finally {
       setIsSubmitting(false);
     }

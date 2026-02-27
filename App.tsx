@@ -9,6 +9,7 @@ import Settings from './components/Settings';
 import DashboardView from './components/DashboardView';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
+import MobileBackdrop from './components/layout/MobileBackdrop';
 import { useConfig } from './hooks/useConfig';
 
 const App: React.FC = () => {
@@ -49,12 +50,5 @@ const App: React.FC = () => {
     </HashRouter>
   );
 };
-
-const MobileBackdrop: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <div
-    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
-    onClick={onClick}
-  />
-);
 
 export default App;

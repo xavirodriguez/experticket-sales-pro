@@ -69,8 +69,13 @@ export interface CapacitySession {
   AvailableCapacity: number;
 }
 
+export interface ProductBaseCapacity {
+  ProductBaseId: string;
+  AvailableCapacity: number;
+}
+
 export interface CapacityResponse extends ApiResponse {
-  ProductBases: any[];
+  ProductBases: ProductBaseCapacity[];
   Products: CapacityProduct[];
   Sessions: CapacitySession[];
 }
@@ -86,10 +91,16 @@ export interface RealTimePriceResponse extends ApiResponse {
   ProductsRealTimePrices: RealTimePrice[];
 }
 
+export interface Ticket {
+  TicketId: string;
+  TicketNumber: string;
+  Price: number;
+}
+
 export interface ReservationProduct {
   ProductId: string;
   Quantity: number;
-  Tickets?: any[];
+  Tickets?: Ticket[];
 }
 
 export interface ReservationRequest {
