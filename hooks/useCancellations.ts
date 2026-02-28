@@ -17,8 +17,9 @@ export const useCancellations = (config: ExperticketConfig) => {
       setLoading(true);
       const res = await service.getCancellationRequests({ PageSize: 20 });
       setRequests(res.CancellationRequests || []);
-    } catch (err) {
-      console.error('Failed to fetch cancellation requests:', err);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.error('Failed to fetch cancellation requests:', message);
     } finally {
       setLoading(false);
     }
@@ -27,9 +28,13 @@ export const useCancellations = (config: ExperticketConfig) => {
   const submitCancellation = useCallback(async (saleId: string, reason: number, comments: string) => {
     try {
       setIsSubmitting(true);
-      await service.submitCancellation(saleId, reason, comments);
+      await service.submitCancellation({
+        saleId,
+        reason,
+        comments
+      });
       await fetchRequests();
-    } catch (err) {
+    } catch (err: unknown) {
       throw err;
     } finally {
       setIsSubmitting(false);

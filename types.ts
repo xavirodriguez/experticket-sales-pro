@@ -70,7 +70,7 @@ export interface CapacitySession {
 }
 
 export interface CapacityResponse extends ApiResponse {
-  ProductBases: any[];
+  ProductBases: unknown[];
   Products: CapacityProduct[];
   Sessions: CapacitySession[];
 }
@@ -89,7 +89,7 @@ export interface RealTimePriceResponse extends ApiResponse {
 export interface ReservationProduct {
   ProductId: string;
   Quantity: number;
-  Tickets?: any[];
+  Tickets?: unknown[];
 }
 
 export interface ReservationRequest {

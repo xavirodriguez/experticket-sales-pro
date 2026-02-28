@@ -18,8 +18,12 @@ export const useDocuments = (config: ExperticketConfig) => {
       setError(null);
       const res = await service.getTransactionDocuments(id);
       setDocuments(res.Documents || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred while fetching documents');
+      }
       setDocuments([]);
     } finally {
       setLoading(false);
