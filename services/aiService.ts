@@ -5,9 +5,10 @@ const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Ex
 
 export class AiService {
   private static getApiKey(): string {
-    const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY ||
-                   (process as any).env?.GEMINI_API_KEY ||
-                   (process as any).env?.API_KEY;
+    const env = import.meta.env;
+    const apiKey = env.VITE_GEMINI_API_KEY ||
+                   env.GEMINI_API_KEY ||
+                   env.API_KEY;
 
     if (!apiKey) {
       throw new Error("Gemini API Key is not configured");
@@ -24,7 +25,6 @@ export class AiService {
     });
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    return result.response.text();
   }
 }
