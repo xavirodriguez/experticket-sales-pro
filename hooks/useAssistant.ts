@@ -29,8 +29,9 @@ export const useAssistant = () => {
     try {
       const response = await AiService.fetchResponse(prompt);
       appendMessage('bot', response || "I'm sorry, I couldn't generate a response.");
-    } catch (err: any) {
-      appendMessage('bot', err.message || "Error connecting to AI service.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error connecting to AI service.";
+      appendMessage('bot', message);
     } finally {
       setIsLoading(false);
     }

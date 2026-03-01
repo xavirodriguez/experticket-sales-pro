@@ -18,8 +18,9 @@ export const useDocuments = (config: ExperticketConfig) => {
       setError(null);
       const res = await service.getTransactionDocuments(id);
       setDocuments(res.Documents || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch documents';
+      setError(message);
       setDocuments([]);
     } finally {
       setLoading(false);
