@@ -70,9 +70,15 @@ export interface CapacitySession {
 }
 
 export interface CapacityResponse extends ApiResponse {
-  ProductBases: any[];
+  ProductBases: unknown[];
   Products: CapacityProduct[];
   Sessions: CapacitySession[];
+}
+
+export interface RealTimePricesParams {
+  productIds: string[];
+  startDate: string;
+  endDate: string;
 }
 
 export interface RealTimePrice {
@@ -89,7 +95,7 @@ export interface RealTimePriceResponse extends ApiResponse {
 export interface ReservationProduct {
   ProductId: string;
   Quantity: number;
-  Tickets?: any[];
+  Tickets?: unknown[];
 }
 
 export interface ReservationRequest {
@@ -104,6 +110,12 @@ export interface ReservationResponse extends ApiResponse {
   ReservationId: string;
   MinutesToExpiry: number;
   TotalPrice: number;
+}
+
+export interface CreateTransactionParams {
+  reservationId: string;
+  accessDate: string;
+  products: { ProductId: string }[];
 }
 
 export interface TransactionProduct {
@@ -129,6 +141,12 @@ export interface Transaction {
 export interface TransactionsResponse extends ApiResponse {
   Transactions: Transaction[];
   TotalCount: number;
+}
+
+export interface SubmitCancellationParams {
+  saleId: string;
+  reason: number;
+  comments?: string;
 }
 
 export interface CancellationRequest {

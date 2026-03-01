@@ -29,8 +29,9 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     setError(null);
     try {
       await action();
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -71,11 +72,11 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
   }, [service, state.accessDate, state.selectedProductId, state.quantity]);
 
   const handleTransaction = useCallback(async () => {
-    await service.createTransaction(
-      state.reservationId,
-      state.accessDate,
-      [{ ProductId: state.selectedProductId }]
-    );
+    await service.createTransaction({
+      reservationId: state.reservationId,
+      accessDate: state.accessDate,
+      products: [{ ProductId: state.selectedProductId }]
+    });
     setState(s => ({ ...s, step: 4 }));
   }, [service, state.reservationId, state.accessDate, state.selectedProductId]);
 

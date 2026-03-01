@@ -17,8 +17,9 @@ export const useTransactions = (config: ExperticketConfig) => {
       setLoading(true);
       const res = await service.getTransactions({ PageSize: 50 });
       setTransactions(res.Transactions || []);
-    } catch (err) {
-      console.error('Failed to fetch transactions:', err);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch transactions';
+      console.error(message, err);
     } finally {
       setLoading(false);
     }

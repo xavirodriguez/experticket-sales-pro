@@ -18,11 +18,11 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
   const wizard = useNewSaleWizard(config);
   const { state, error, resetWizard } = wizard;
 
-  const handleViewTransactions = () => {
+  const handleViewTransactions = React.useCallback(() => {
     window.location.hash = '/transactions';
-  };
+  }, []);
 
-  const STEPS: Record<number, React.ReactNode> = {
+  const STEPS: Record<number, React.ReactNode> = React.useMemo(() => ({
     1: (
       <ProductSelectionStep
         providers={wizard.providers}
@@ -47,7 +47,20 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
         onViewTransactions={handleViewTransactions}
       />
     )
-  };
+  }), [
+    wizard.providers,
+    wizard.filteredProducts,
+    state.selectedProviderId,
+    state.selectedProductId,
+    state.accessDate,
+    state.quantity,
+    wizard.updateState,
+    wizard.capacityInfo,
+    state.reservationId,
+    state.reservationExpiry,
+    resetWizard,
+    handleViewTransactions
+  ]);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

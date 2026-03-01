@@ -10,7 +10,10 @@ import {
   TransactionsResponse,
   CancellationRequestsResponse,
   ApiResponse,
-  TransactionDocumentsResponse
+  TransactionDocumentsResponse,
+  RealTimePricesParams,
+  CreateTransactionParams,
+  SubmitCancellationParams
 } from '../types';
 
 export class ExperticketApiError extends Error {
@@ -52,39 +55,24 @@ class ExperticketService {
     });
   }
 
-  async getRealTimePrices(productIds: string[], startDate: string, endDate: string): Promise<RealTimePriceResponse> {
-    return this.request<RealTimePriceResponse>('/RealTimePrices', {
-      method: 'POST',
-      body: JSON.stringify({
-        PartnerId: this.config.partnerId,
-        ProductIds: productIds,
-        StartDate: startDate,
-        EndDate: endDate
-      })
+  async getRealTimePrices(params: RealTimePricesParams): Promise<RealTimePriceResponse> {
+    return this.post<RealTimePriceResponse>('/RealTimePrices', {
+      PartnerId: this.config.partnerId,
+      ProductIds: params.productIds,
+      StartDate: params.startDate,
+      EndDate: params.endDate
     });
   }
 
   async createReservation(payload: { AccessDateTime: string; Products: { ProductId: string; Quantity: number }[] }): Promise<ReservationResponse> {
-    return this.request<ReservationResponse>('/reservation', {
-      method: 'POST',
-      body: JSON.stringify({
-        ...payload,
-        ApiKey: this.config.apiKey,
-        IsTest: this.config.isTest
-      })
-    });
+    return this.post<ReservationResponse>('/reservation', payload);
   }
 
-  async createTransaction(reservationId: string, accessDate: string, products: { ProductId: string }[]): Promise<ApiResponse> {
-    return this.request<ApiResponse>('/transaction', {
-      method: 'POST',
-      body: JSON.stringify({
-        ApiKey: this.config.apiKey,
-        ReservationId: reservationId,
-        AccessDateTime: accessDate,
-        Products: products,
-        IsTest: this.config.isTest
-      })
+  async createTransaction(params: CreateTransactionParams): Promise<ApiResponse> {
+    return this.post<ApiResponse>('/transaction', {
+      ReservationId: params.reservationId,
+      AccessDateTime: params.accessDate,
+      Products: params.products
     });
   }
 
@@ -102,16 +90,11 @@ class ExperticketService {
     });
   }
 
-  async submitCancellation(saleId: string, reason: number, comments: string = ''): Promise<ApiResponse> {
-    return this.request<ApiResponse>('/cancellationrequest', {
-      method: 'POST',
-      body: JSON.stringify({
-        ApiKey: this.config.apiKey,
-        SaleId: saleId,
-        Reason: reason,
-        ReasonComments: comments,
-        IsTest: this.config.isTest
-      })
+  async submitCancellation(params: SubmitCancellationParams): Promise<ApiResponse> {
+    return this.post<ApiResponse>('/cancellationrequest', {
+      SaleId: params.saleId,
+      Reason: params.reason,
+      ReasonComments: params.comments || ''
     });
   }
 
@@ -120,6 +103,17 @@ class ExperticketService {
       ApiKey: this.config.apiKey,
       id: id,
       IncludeTransactionDocumentsLanguages: 'true'
+    });
+  }
+
+  private async post<T extends ApiResponse>(endpoint: string, body: object): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        ...body,
+        ApiKey: this.config.apiKey,
+        IsTest: this.config.isTest
+      })
     });
   }
 
