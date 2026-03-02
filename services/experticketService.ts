@@ -16,6 +16,8 @@ import {
   SubmitCancellationParams
 } from '../types';
 
+const INCLUDE_PRICES_TRUE = 'true';
+
 export class ExperticketApiError extends Error {
   constructor(public message: string, public errorCode?: number) {
     super(message);
@@ -23,35 +25,51 @@ export class ExperticketApiError extends Error {
   }
 }
 
+interface RequestConfig {
+  endpoint: string;
+  options?: RequestInit;
+  params?: Record<string, string | number>;
+}
+
 class ExperticketService {
   constructor(private readonly config: ExperticketConfig) {}
 
   async getLanguages(): Promise<LanguagesResponse> {
-    return this.request<LanguagesResponse>('/AvailableLanguages', {}, {
-      PartnerId: this.config.partnerId
+    return this.request<LanguagesResponse>({
+      endpoint: '/AvailableLanguages',
+      params: { PartnerId: this.config.partnerId }
     });
   }
 
   async getProviders(): Promise<ProvidersResponse> {
-    return this.request<ProvidersResponse>('/providers', {}, {
-      PartnerId: this.config.partnerId,
-      LanguageCode: this.config.languageCode
+    return this.request<ProvidersResponse>({
+      endpoint: '/providers',
+      params: {
+        PartnerId: this.config.partnerId,
+        LanguageCode: this.config.languageCode
+      }
     });
   }
 
   async getCatalog(): Promise<CatalogResponse> {
-    return this.request<CatalogResponse>('/catalog', {}, {
-      PartnerId: this.config.partnerId,
-      LanguageCode: this.config.languageCode
+    return this.request<CatalogResponse>({
+      endpoint: '/catalog',
+      params: {
+        PartnerId: this.config.partnerId,
+        LanguageCode: this.config.languageCode
+      }
     });
   }
 
   async checkCapacity(productIds: string[], dates: string[]): Promise<CapacityResponse> {
-    return this.request<CapacityResponse>('/availablecapacity', {}, {
-      PartnerId: this.config.partnerId,
-      ProductIds: productIds.join(','),
-      Dates: dates.join(','),
-      IncludePrices: 'true'
+    return this.request<CapacityResponse>({
+      endpoint: '/availablecapacity',
+      params: {
+        PartnerId: this.config.partnerId,
+        ProductIds: productIds.join(','),
+        Dates: dates.join(','),
+        IncludePrices: INCLUDE_PRICES_TRUE
+      }
     });
   }
 
@@ -77,16 +95,22 @@ class ExperticketService {
   }
 
   async getTransactions(params: Record<string, string | number> = {}): Promise<TransactionsResponse> {
-    return this.request<TransactionsResponse>('/transaction', {}, {
-      ApiKey: this.config.apiKey,
-      ...params
+    return this.request<TransactionsResponse>({
+      endpoint: '/transaction',
+      params: {
+        ApiKey: this.config.apiKey,
+        ...params
+      }
     });
   }
 
   async getCancellationRequests(params: Record<string, string | number> = {}): Promise<CancellationRequestsResponse> {
-    return this.request<CancellationRequestsResponse>('/cancellationrequest', {}, {
-      ApiKey: this.config.apiKey,
-      ...params
+    return this.request<CancellationRequestsResponse>({
+      endpoint: '/cancellationrequest',
+      params: {
+        ApiKey: this.config.apiKey,
+        ...params
+      }
     });
   }
 
@@ -99,30 +123,33 @@ class ExperticketService {
   }
 
   async getTransactionDocuments(id: string): Promise<TransactionDocumentsResponse> {
-    return this.request<TransactionDocumentsResponse>('/transactiondocuments', {}, {
-      ApiKey: this.config.apiKey,
-      id: id,
-      IncludeTransactionDocumentsLanguages: 'true'
+    return this.request<TransactionDocumentsResponse>({
+      endpoint: '/transactiondocuments',
+      params: {
+        ApiKey: this.config.apiKey,
+        id: id,
+        IncludeTransactionDocumentsLanguages: INCLUDE_PRICES_TRUE
+      }
     });
   }
 
   private async post<T extends ApiResponse>(endpoint: string, body: object): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'POST',
-      body: JSON.stringify({
-        ...body,
-        ApiKey: this.config.apiKey,
-        IsTest: this.config.isTest
-      })
+    return this.request<T>({
+      endpoint,
+      options: {
+        method: 'POST',
+        body: JSON.stringify({
+          ...body,
+          ApiKey: this.config.apiKey,
+          IsTest: this.config.isTest
+        })
+      }
     });
   }
 
-  private async request<T extends ApiResponse>(
-    endpoint: string,
-    options: RequestInit = {},
-    params: Record<string, string | number> = {}
-  ): Promise<T> {
+  private async request<T extends ApiResponse>(config: RequestConfig): Promise<T> {
     try {
+      const { endpoint, options = {}, params = {} } = config;
       const url = this.buildUrl(endpoint, params);
       const response = await this.executeFetch(url, options);
       const data = await this.parseResponse<T>(response);

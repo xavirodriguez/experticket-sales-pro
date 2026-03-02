@@ -38,12 +38,12 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
   }, []);
 
   const loadInitialData = useCallback(async () => {
-    const [provRes, catRes] = await Promise.all([
+    const [providersResponse, catalogResponse] = await Promise.all([
       service.getProviders(),
       service.getCatalog()
     ]);
-    setProviders(provRes.Providers || []);
-    setCatalog(catRes);
+    setProviders(providersResponse.Providers || []);
+    setCatalog(catalogResponse);
   }, [service]);
 
   useEffect(() => {
@@ -59,15 +59,15 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
   }, [service, state.selectedProductId, state.accessDate]);
 
   const handleReservation = useCallback(async () => {
-    const res = await service.createReservation({
+    const reservationResponse = await service.createReservation({
       AccessDateTime: state.accessDate,
       Products: [{ ProductId: state.selectedProductId, Quantity: state.quantity }]
     });
     setState(s => ({
       ...s,
       step: 3,
-      reservationId: res.ReservationId,
-      reservationExpiry: res.MinutesToExpiry
+      reservationId: reservationResponse.ReservationId,
+      reservationExpiry: reservationResponse.MinutesToExpiry
     }));
   }, [service, state.accessDate, state.selectedProductId, state.quantity]);
 
