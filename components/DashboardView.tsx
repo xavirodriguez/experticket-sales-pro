@@ -47,6 +47,18 @@ const DashboardView: React.FC<{ config: ExperticketConfig }> = ({ config }) => (
   </div>
 );
 
+const COLOR_CLASSES: Record<string, string> = {
+  blue: 'bg-blue-50 text-blue-600',
+  green: 'bg-green-50 text-green-600',
+  purple: 'bg-purple-50 text-purple-600',
+};
+
+const TEXT_COLORS: Record<string, string> = {
+  blue: 'text-blue-600',
+  green: 'text-green-600',
+  purple: 'text-gray-400',
+};
+
 const DashboardCard: React.FC<{
   icon: React.ElementType;
   title: string;
@@ -54,19 +66,13 @@ const DashboardCard: React.FC<{
   trend: string;
   color: string;
 }> = ({ icon: Icon, title, value, trend, color }) => {
-  const colorClasses: Record<string, string> = {
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-green-600',
-    purple: 'bg-purple-50 text-purple-600',
-  };
-
   return (
     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
+        <div className={`p-2 rounded-lg ${COLOR_CLASSES[color]}`}>
           <Icon size={20} />
         </div>
-        <span className={`text-xs font-bold ${color === 'purple' ? 'text-gray-400' : colorClasses[color].split(' ')[1]}`}>
+        <span className={`text-xs font-bold ${TEXT_COLORS[color]}`}>
           {trend}
         </span>
       </div>
