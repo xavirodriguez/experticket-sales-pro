@@ -11,9 +11,9 @@ import {
   CancellationRequestsResponse,
   ApiResponse,
   TransactionDocumentsResponse,
-  RealTimePricesParams,
-  CreateTransactionParams,
-  SubmitCancellationParams
+  RealTimePriceSearchParams,
+  TransactionCreationParams,
+  CancellationSubmissionParams
 } from '../types';
 
 const INCLUDE_PRICES_TRUE = 'true';
@@ -73,61 +73,61 @@ class ExperticketService {
     });
   }
 
-  async getRealTimePrices(params: RealTimePricesParams): Promise<RealTimePriceResponse> {
+  async getRealTimePrices(searchParams: RealTimePriceSearchParams): Promise<RealTimePriceResponse> {
     return this.post<RealTimePriceResponse>('/RealTimePrices', {
       PartnerId: this.config.partnerId,
-      ProductIds: params.productIds,
-      StartDate: params.startDate,
-      EndDate: params.endDate
+      ProductIds: searchParams.productIds,
+      StartDate: searchParams.startDate,
+      EndDate: searchParams.endDate
     });
   }
 
-  async createReservation(payload: { AccessDateTime: string; Products: { ProductId: string; Quantity: number }[] }): Promise<ReservationResponse> {
-    return this.post<ReservationResponse>('/reservation', payload);
+  async createReservation(reservationPayload: { AccessDateTime: string; Products: { ProductId: string; Quantity: number }[] }): Promise<ReservationResponse> {
+    return this.post<ReservationResponse>('/reservation', reservationPayload);
   }
 
-  async createTransaction(params: CreateTransactionParams): Promise<ApiResponse> {
+  async createTransaction(transactionParams: TransactionCreationParams): Promise<ApiResponse> {
     return this.post<ApiResponse>('/transaction', {
-      ReservationId: params.reservationId,
-      AccessDateTime: params.accessDate,
-      Products: params.products
+      ReservationId: transactionParams.reservationId,
+      AccessDateTime: transactionParams.accessDate,
+      Products: transactionParams.products
     });
   }
 
-  async getTransactions(params: Record<string, string | number> = {}): Promise<TransactionsResponse> {
+  async getTransactions(searchParams: Record<string, string | number> = {}): Promise<TransactionsResponse> {
     return this.request<TransactionsResponse>({
       endpoint: '/transaction',
       params: {
         ApiKey: this.config.apiKey,
-        ...params
+        ...searchParams
       }
     });
   }
 
-  async getCancellationRequests(params: Record<string, string | number> = {}): Promise<CancellationRequestsResponse> {
+  async getCancellationRequests(searchParams: Record<string, string | number> = {}): Promise<CancellationRequestsResponse> {
     return this.request<CancellationRequestsResponse>({
       endpoint: '/cancellationrequest',
       params: {
         ApiKey: this.config.apiKey,
-        ...params
+        ...searchParams
       }
     });
   }
 
-  async submitCancellation(params: SubmitCancellationParams): Promise<ApiResponse> {
+  async submitCancellation(cancellationParams: CancellationSubmissionParams): Promise<ApiResponse> {
     return this.post<ApiResponse>('/cancellationrequest', {
-      SaleId: params.saleId,
-      Reason: params.reason,
-      ReasonComments: params.comments || ''
+      SaleId: cancellationParams.saleId,
+      Reason: cancellationParams.reason,
+      ReasonComments: cancellationParams.comments || ''
     });
   }
 
-  async getTransactionDocuments(id: string): Promise<TransactionDocumentsResponse> {
+  async getTransactionDocuments(transactionId: string): Promise<TransactionDocumentsResponse> {
     return this.request<TransactionDocumentsResponse>({
       endpoint: '/transactiondocuments',
       params: {
         ApiKey: this.config.apiKey,
-        id: id,
+        id: transactionId,
         IncludeTransactionDocumentsLanguages: INCLUDE_PRICES_TRUE
       }
     });

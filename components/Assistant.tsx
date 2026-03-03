@@ -8,13 +8,13 @@ import AssistantInput from './assistant/AssistantInput';
 
 const Assistant: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [prompt, setPrompt] = useState('');
+  const [userPrompt, setUserPrompt] = useState('');
   const { messages, isLoading, sendMessage } = useAssistant();
 
   const handleSend = async () => {
-    if (!prompt.trim()) return;
-    const currentPrompt = prompt;
-    setPrompt('');
+    if (!userPrompt.trim()) return;
+    const currentPrompt = userPrompt;
+    setUserPrompt('');
     await sendMessage(currentPrompt);
   };
 
@@ -27,8 +27,8 @@ const Assistant: React.FC = () => {
           <AssistantHeader onClose={() => setIsOpen(false)} />
           <AssistantMessages messages={messages} isLoading={isLoading} />
           <AssistantInput
-            prompt={prompt}
-            setPrompt={setPrompt}
+            prompt={userPrompt}
+            setPrompt={setUserPrompt}
             onSend={handleSend}
             isLoading={isLoading}
           />

@@ -20,18 +20,18 @@ export const useAssistant = () => {
     setMessages(prev => [...prev, { role, text }]);
   }, []);
 
-  const sendMessage = useCallback(async (prompt: string) => {
-    if (!prompt.trim()) return;
+  const sendMessage = useCallback(async (userPrompt: string) => {
+    if (!userPrompt.trim()) return;
 
-    appendMessage('user', prompt);
+    appendMessage('user', userPrompt);
     setIsLoading(true);
 
     try {
-      const response = await AiService.fetchResponse(prompt);
-      appendMessage('bot', response || "I'm sorry, I couldn't generate a response.");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Error connecting to AI service.";
-      appendMessage('bot', message);
+      const aiResponse = await AiService.fetchResponse(userPrompt);
+      appendMessage('bot', aiResponse || "I'm sorry, I couldn't generate a response.");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Error connecting to AI service.";
+      appendMessage('bot', errorMessage);
     } finally {
       setIsLoading(false);
     }

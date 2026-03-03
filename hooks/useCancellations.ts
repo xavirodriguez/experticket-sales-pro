@@ -15,11 +15,11 @@ export const useCancellations = (config: ExperticketConfig) => {
 
     try {
       setLoading(true);
-      const res = await service.getCancellationRequests({ PageSize: 20 });
-      setRequests(res.CancellationRequests || []);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch cancellation requests';
-      console.error(message, err);
+      const response = await service.getCancellationRequests({ PageSize: 20 });
+      setRequests(response.CancellationRequests || []);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch cancellation requests';
+      console.error(errorMessage, error);
     } finally {
       setLoading(false);
     }
@@ -30,8 +30,8 @@ export const useCancellations = (config: ExperticketConfig) => {
       setIsSubmitting(true);
       await service.submitCancellation({ saleId, reason, comments });
       await fetchRequests();
-    } catch (err: unknown) {
-      throw err;
+    } catch (error: unknown) {
+      throw error;
     } finally {
       setIsSubmitting(false);
     }

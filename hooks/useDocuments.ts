@@ -10,17 +10,17 @@ export const useDocuments = (config: ExperticketConfig) => {
 
   const service = useMemo(() => new ExperticketService(config), [config]);
 
-  const fetchDocuments = useCallback(async (id: string) => {
-    if (!id) return;
+  const fetchDocuments = useCallback(async (transactionId: string) => {
+    if (!transactionId) return;
 
     try {
       setLoading(true);
       setError(null);
-      const res = await service.getTransactionDocuments(id);
-      setDocuments(res.Documents || []);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch documents';
-      setError(message);
+      const response = await service.getTransactionDocuments(transactionId);
+      setDocuments(response.Documents || []);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch documents';
+      setError(errorMessage);
       setDocuments([]);
     } finally {
       setLoading(false);
