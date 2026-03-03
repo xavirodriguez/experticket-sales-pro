@@ -75,7 +75,7 @@ export interface CapacityResponse extends ApiResponse {
   Sessions: CapacitySession[];
 }
 
-export interface RealTimePricesParams {
+export interface RealTimePriceSearchParams {
   productIds: string[];
   startDate: string;
   endDate: string;
@@ -112,7 +112,7 @@ export interface ReservationResponse extends ApiResponse {
   TotalPrice: number;
 }
 
-export interface CreateTransactionParams {
+export interface TransactionCreationParams {
   reservationId: string;
   accessDate: string;
   products: { ProductId: string }[];
@@ -143,7 +143,7 @@ export interface TransactionsResponse extends ApiResponse {
   TotalCount: number;
 }
 
-export interface SubmitCancellationParams {
+export interface CancellationSubmissionParams {
   saleId: string;
   reason: number;
   comments?: string;
@@ -183,7 +183,7 @@ export enum CancellationReason {
   INTEGRATION_ISSUES = 6
 }
 
-export interface WizardState {
+export interface SaleWizardState {
   step: number;
   selectedProviderId: string;
   selectedProductId: string;

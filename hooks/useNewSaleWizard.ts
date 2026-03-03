@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ExperticketConfig, Provider, CatalogResponse, CapacityResponse, Product, WizardState } from '../types';
+import { ExperticketConfig, Provider, CatalogResponse, CapacityResponse, Product, SaleWizardState } from '../types';
 import ExperticketService from '../services/experticketService';
 
-const INITIAL_STATE: WizardState = {
+const INITIAL_STATE: SaleWizardState = {
   step: 1,
   selectedProviderId: '',
   selectedProductId: '',
@@ -15,7 +15,7 @@ const INITIAL_STATE: WizardState = {
 };
 
 export const useNewSaleWizard = (config: ExperticketConfig) => {
-  const [state, setState] = useState<WizardState>(INITIAL_STATE);
+  const [state, setState] = useState<SaleWizardState>(INITIAL_STATE);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [providers, setProviders] = useState<Provider[]>([]);
@@ -55,7 +55,7 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
 
     const capacity = await service.checkCapacity([state.selectedProductId], [state.accessDate]);
     setCapacityInfo(capacity);
-    setState(s => ({ ...s, step: 2 }));
+    setState(prevState => ({ ...prevState, step: 2 }));
   }, [service, state.selectedProductId, state.accessDate]);
 
   const handleReservation = useCallback(async () => {
@@ -63,8 +63,8 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
       AccessDateTime: state.accessDate,
       Products: [{ ProductId: state.selectedProductId, Quantity: state.quantity }]
     });
-    setState(s => ({
-      ...s,
+    setState(prevState => ({
+      ...prevState,
       step: 3,
       reservationId: reservationResponse.ReservationId,
       reservationExpiry: reservationResponse.MinutesToExpiry
@@ -77,7 +77,7 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
       accessDate: state.accessDate,
       products: [{ ProductId: state.selectedProductId }]
     });
-    setState(s => ({ ...s, step: 4 }));
+    setState(prevState => ({ ...prevState, step: 4 }));
   }, [service, state.reservationId, state.accessDate, state.selectedProductId]);
 
   const goToNextStep = useCallback(() => executeAction(async () => {
@@ -92,18 +92,18 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
   }), [state.step, executeAction, handleProductSelection, handleReservation, handleTransaction]);
 
   const goToPreviousStep = useCallback(() => {
-    setState(s => ({ ...s, step: Math.max(1, s.step - 1) }));
+    setState(prevState => ({ ...prevState, step: Math.max(1, prevState.step - 1) }));
   }, []);
 
   const resetWizard = useCallback(() => setState(INITIAL_STATE), []);
 
-  const updateState = useCallback((updates: Partial<WizardState>) => {
-    setState(s => ({ ...s, ...updates }));
+  const updateState = useCallback((updates: Partial<SaleWizardState>) => {
+    setState(prevState => ({ ...prevState, ...updates }));
   }, []);
 
   const filteredProducts = useMemo((): Product[] => {
-    const products = catalog?.ProductBases?.flatMap(pb => pb.Products || []) || [];
-    return products.filter(p => p.ProviderId === state.selectedProviderId);
+    const products = catalog?.ProductBases?.flatMap(productBase => productBase.Products || []) || [];
+    return products.filter(product => product.ProviderId === state.selectedProviderId);
   }, [catalog, state.selectedProviderId]);
 
   return {

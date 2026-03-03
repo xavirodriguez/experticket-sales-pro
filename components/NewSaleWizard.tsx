@@ -22,42 +22,54 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
     window.location.hash = '/transactions';
   }, []);
 
-  const STEPS: Record<number, React.ReactNode> = React.useMemo(() => ({
-    1: (
-      <ProductSelectionStep
-        providers={wizard.providers}
-        products={wizard.filteredProducts}
-        selectedProviderId={state.selectedProviderId}
-        selectedProductId={state.selectedProductId}
-        accessDate={state.accessDate}
-        quantity={state.quantity}
-        onUpdate={wizard.updateState}
-      />
-    ),
-    2: <CapacityCheckStep capacityInfo={wizard.capacityInfo} />,
-    3: (
-      <ReservationStep
-        reservationId={state.reservationId}
-        reservationExpiry={state.reservationExpiry}
-      />
-    ),
-    4: (
-      <SaleConfirmationStep
-        onNewBooking={resetWizard}
-        onViewTransactions={handleViewTransactions}
-      />
-    )
-  }), [
-    wizard.providers,
-    wizard.filteredProducts,
+  const renderProductSelection = () => (
+    <ProductSelectionStep
+      providers={wizard.providers}
+      products={wizard.filteredProducts}
+      selectedProviderId={state.selectedProviderId}
+      selectedProductId={state.selectedProductId}
+      accessDate={state.accessDate}
+      quantity={state.quantity}
+      onUpdate={wizard.updateState}
+    />
+  );
+
+  const renderCapacityCheck = () => <CapacityCheckStep capacityInfo={wizard.capacityInfo} />;
+
+  const renderReservation = () => (
+    <ReservationStep
+      reservationId={state.reservationId}
+      reservationExpiry={state.reservationExpiry}
+    />
+  );
+
+  const renderConfirmation = () => (
+    <SaleConfirmationStep
+      onNewBooking={resetWizard}
+      onViewTransactions={handleViewTransactions}
+    />
+  );
+
+  const renderStep = React.useCallback(() => {
+    switch (state.step) {
+      case 1: return renderProductSelection();
+      case 2: return renderCapacityCheck();
+      case 3: return renderReservation();
+      case 4: return renderConfirmation();
+      default: return <React.Fragment />;
+    }
+  }, [
+    state.step,
     state.selectedProviderId,
     state.selectedProductId,
     state.accessDate,
     state.quantity,
-    wizard.updateState,
-    wizard.capacityInfo,
     state.reservationId,
     state.reservationExpiry,
+    wizard.providers,
+    wizard.filteredProducts,
+    wizard.updateState,
+    wizard.capacityInfo,
     resetWizard,
     handleViewTransactions
   ]);
@@ -68,7 +80,7 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
 
       <div className="p-8 min-h-[400px]">
         {error && <ErrorMessage message={error} />}
-        {STEPS[state.step]}
+        {renderStep()}
       </div>
 
       {state.step < 4 && (

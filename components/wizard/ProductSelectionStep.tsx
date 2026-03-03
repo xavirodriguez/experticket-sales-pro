@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Provider, Product, WizardState } from '../../types';
+import { Provider, Product, SaleWizardState } from '../../types';
 
 interface ProductSelectionStepProps {
   providers: Provider[];
@@ -9,7 +9,7 @@ interface ProductSelectionStepProps {
   selectedProductId: string;
   accessDate: string;
   quantity: number;
-  onUpdate: (updates: Partial<WizardState>) => void;
+  onUpdate: (updates: Partial<SaleWizardState>) => void;
 }
 
 const ProductSelectionStep: React.FC<ProductSelectionStepProps> = ({
@@ -32,8 +32,8 @@ const ProductSelectionStep: React.FC<ProductSelectionStepProps> = ({
             onChange={(e) => onUpdate({ selectedProviderId: e.target.value, selectedProductId: '' })}
           >
             <option value="">Choose a provider...</option>
-            {providers.map(p => (
-              <option key={p.Id} value={p.Id}>{p.Name}</option>
+            {providers.map(provider => (
+              <option key={provider.Id} value={provider.Id}>{provider.Name}</option>
             ))}
           </select>
         </div>
@@ -46,8 +46,8 @@ const ProductSelectionStep: React.FC<ProductSelectionStepProps> = ({
             onChange={(e) => onUpdate({ selectedProductId: e.target.value })}
           >
             <option value="">Choose a product...</option>
-            {products.map((p) => (
-              <option key={p.Id} value={p.Id}>{p.Name}</option>
+            {products.map((product) => (
+              <option key={product.Id} value={product.Id}>{product.Name}</option>
             ))}
           </select>
         </div>

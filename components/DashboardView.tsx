@@ -4,7 +4,19 @@ import { Link } from 'react-router-dom';
 import { ShoppingBag, History, FileText } from 'lucide-react';
 import { ExperticketConfig } from '../types';
 
-const DashboardView: React.FC<{ config: ExperticketConfig }> = ({ config }) => (
+const COLOR_CLASSES: Record<string, string> = {
+  blue: 'bg-blue-50 text-blue-600',
+  green: 'bg-green-50 text-green-600',
+  purple: 'bg-purple-50 text-purple-600',
+};
+
+const TEXT_COLORS: Record<string, string> = {
+  blue: 'text-blue-600',
+  green: 'text-green-600',
+  purple: 'text-gray-400',
+};
+
+const DashboardView: React.FC<{ config: ExperticketConfig }> = () => (
   <div className="space-y-6">
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <DashboardCard
@@ -46,18 +58,6 @@ const DashboardView: React.FC<{ config: ExperticketConfig }> = ({ config }) => (
     </div>
   </div>
 );
-
-const COLOR_CLASSES: Record<string, string> = {
-  blue: 'bg-blue-50 text-blue-600',
-  green: 'bg-green-50 text-green-600',
-  purple: 'bg-purple-50 text-purple-600',
-};
-
-const TEXT_COLORS: Record<string, string> = {
-  blue: 'text-blue-600',
-  green: 'text-green-600',
-  purple: 'text-gray-400',
-};
 
 const DashboardCard: React.FC<{
   icon: React.ElementType;

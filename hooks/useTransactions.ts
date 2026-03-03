@@ -15,11 +15,11 @@ export const useTransactions = (config: ExperticketConfig) => {
 
     try {
       setLoading(true);
-      const res = await service.getTransactions({ PageSize: 50 });
-      setTransactions(res.Transactions || []);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch transactions';
-      console.error(message, err);
+      const response = await service.getTransactions({ PageSize: 50 });
+      setTransactions(response.Transactions || []);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch transactions';
+      console.error(errorMessage, error);
     } finally {
       setLoading(false);
     }
@@ -30,10 +30,10 @@ export const useTransactions = (config: ExperticketConfig) => {
   }, [fetchTransactions]);
 
   const filteredTransactions = useMemo(() => {
-    const term = searchTerm.toLowerCase();
-    return transactions.filter(t =>
-      t.TransactionId.toLowerCase().includes(term) ||
-      t.Products?.some(p => p.ProductName?.toLowerCase().includes(term))
+    const searchToken = searchTerm.toLowerCase();
+    return transactions.filter(transaction =>
+      transaction.TransactionId.toLowerCase().includes(searchToken) ||
+      transaction.Products?.some(product => product.ProductName?.toLowerCase().includes(searchToken))
     );
   }, [transactions, searchTerm]);
 
