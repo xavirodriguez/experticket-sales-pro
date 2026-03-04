@@ -10,18 +10,46 @@ import ReservationStep from './wizard/ReservationStep';
 import SaleConfirmationStep from './wizard/SaleConfirmationStep';
 import WizardNavigation from './wizard/WizardNavigation';
 
+/**
+ * Props for the {@link NewSaleWizard} component.
+ */
 interface NewSaleWizardProps {
+  /** The Experticket API configuration. */
   config: ExperticketConfig;
 }
 
+/**
+ * A multi-step wizard component for processing new sales.
+ *
+ * @remarks
+ * This component guides the user through four distinct steps:
+ * 1. Product Selection
+ * 2. Capacity Check
+ * 3. Reservation
+ * 4. Confirmation
+ *
+ * @param props - Component props.
+ *
+ * @example
+ * ```tsx
+ * <NewSaleWizard config={config} />
+ * ```
+ */
 const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
   const wizard = useNewSaleWizard(config);
   const { state, error, resetWizard } = wizard;
 
+  /**
+   * Navigates the user to the transactions view.
+   */
   const handleViewTransactions = React.useCallback(() => {
     window.location.hash = '/transactions';
   }, []);
 
+  /**
+   * Renders the first step of the wizard: Product Selection.
+   * @internal
+   */
   const renderProductSelection = () => (
     <ProductSelectionStep
       providers={wizard.providers}
@@ -34,8 +62,16 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
     />
   );
 
+  /**
+   * Renders the second step of the wizard: Capacity Check.
+   * @internal
+   */
   const renderCapacityCheck = () => <CapacityCheckStep capacityInfo={wizard.capacityInfo} />;
 
+  /**
+   * Renders the third step of the wizard: Reservation details.
+   * @internal
+   */
   const renderReservation = () => (
     <ReservationStep
       reservationId={state.reservationId}
@@ -43,6 +79,10 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
     />
   );
 
+  /**
+   * Renders the final step of the wizard: Sale Confirmation.
+   * @internal
+   */
   const renderConfirmation = () => (
     <SaleConfirmationStep
       onNewBooking={resetWizard}
@@ -50,6 +90,10 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
     />
   );
 
+  /**
+   * Determines which step to render based on the current wizard state.
+   * @internal
+   */
   const renderStep = React.useCallback(() => {
     switch (state.step) {
       case 1: return renderProductSelection();
@@ -95,6 +139,10 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
   );
 };
 
+/**
+ * Internal component for displaying error messages within the wizard.
+ * @internal
+ */
 const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
   <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-center space-x-3">
     <AlertCircle size={20} />

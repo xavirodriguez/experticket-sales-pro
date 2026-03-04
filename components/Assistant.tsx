@@ -6,11 +6,27 @@ import AssistantHeader from './assistant/AssistantHeader';
 import AssistantMessages from './assistant/AssistantMessages';
 import AssistantInput from './assistant/AssistantInput';
 
+/**
+ * An AI-powered sales assistant component.
+ *
+ * @remarks
+ * This component provides a chat interface for sales agents to get assistance
+ * with ticketing terminology and platform processes.
+ *
+ * @example
+ * ```tsx
+ * <Assistant />
+ * ```
+ */
 const Assistant: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userPrompt, setUserPrompt] = useState('');
   const { messages, isLoading, sendMessage } = useAssistant();
 
+  /**
+   * Handles sending the user prompt to the AI service.
+   * @internal
+   */
   const handleSend = async () => {
     if (!userPrompt.trim()) return;
     const currentPrompt = userPrompt;
