@@ -4,7 +4,7 @@ import { ExperticketConfig, CancellationRequest } from '../types';
 import ExperticketService from '../services/experticketService';
 
 /**
- * Hook for managing cancellation requests.
+ * Manages cancellation requests and their submission.
  *
  * @param config - The Experticket API configuration.
  * @returns An object containing the list of requests, loading states, and a function to submit new cancellations.
@@ -23,6 +23,7 @@ export const useCancellations = (config: ExperticketConfig) => {
 
   /**
    * Fetches the latest cancellation requests from the API.
+   * @internal
    */
   const fetchRequests = useCallback(async () => {
     if (!config.apiKey) return;

@@ -33,24 +33,25 @@ const INITIAL_STATE: SaleWizardState = {
 export const useNewSaleWizard = (config: ExperticketConfig) => {
   const [state, setState] = useState<SaleWizardState>(INITIAL_STATE);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>('');
   const [providers, setProviders] = useState<Provider[]>([]);
-  const [catalog, setCatalog] = useState<CatalogResponse | null>(null);
-  const [capacityInfo, setCapacityInfo] = useState<CapacityResponse | null>(null);
+  const [catalog, setCatalog] = useState<CatalogResponse | undefined>(undefined);
+  const [capacityInfo, setCapacityInfo] = useState<CapacityResponse | undefined>(undefined);
 
   const service = useMemo(() => new ExperticketService(config), [config]);
 
   /**
    * Executes an asynchronous action with automatic loading and error state management.
+   * @internal
    */
   const executeAction = useCallback(async (action: () => Promise<void>) => {
     setLoading(true);
-    setError(null);
+    setError('');
     try {
       await action();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'An unexpected error occurred';
-      setError(message);
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -58,6 +59,7 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
 
   /**
    * Loads initial data required for the wizard.
+   * @internal
    */
   const loadInitialData = useCallback(async () => {
     const [providersResponse, catalogResponse] = await Promise.all([
@@ -74,6 +76,7 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
 
   /**
    * Handles product selection and transitions to the capacity check step.
+   * @internal
    */
   const handleProductSelection = useCallback(async () => {
     if (!state.selectedProductId) throw new Error('Please select a product');
@@ -85,11 +88,12 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
 
   /**
    * Creates a reservation and transitions to the reservation details step.
+   * @internal
    */
   const handleReservation = useCallback(async () => {
     const reservationResponse = await service.createReservation({
-      AccessDateTime: state.accessDate,
-      Products: [{ ProductId: state.selectedProductId, Quantity: state.quantity }]
+      accessDateTime: state.accessDate,
+      products: [{ ProductId: state.selectedProductId, Quantity: state.quantity }]
     });
     setState(prevState => ({
       ...prevState,
@@ -101,6 +105,7 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
 
   /**
    * Finalizes the transaction and transitions to the confirmation step.
+   * @internal
    */
   const handleTransaction = useCallback(async () => {
     await service.createTransaction({

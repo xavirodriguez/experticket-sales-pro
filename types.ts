@@ -203,7 +203,18 @@ export interface ReservationProduct {
 }
 
 /**
+ * Parameters for creating a new reservation.
+ */
+export interface ReservationCreationParams {
+  /** The intended date and time of access (YYYY-MM-DD or ISO). */
+  accessDateTime: string;
+  /** List of products and quantities to reserve. */
+  products: ReservationProduct[];
+}
+
+/**
  * Request payload for creating a new reservation.
+ * @internal
  */
 export interface ReservationRequest {
   /** API key for authentication. */

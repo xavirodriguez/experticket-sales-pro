@@ -18,7 +18,7 @@ const INITIAL_MESSAGE: AssistantMessage = {
 };
 
 /**
- * Hook for managing the state and interactions with the AI sales assistant.
+ * Manages the state and interactions with the AI sales assistant.
  *
  * @returns An object containing the message history, loading state, and a function to send messages.
  *

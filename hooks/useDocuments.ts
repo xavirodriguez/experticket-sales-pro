@@ -4,7 +4,7 @@ import { ExperticketConfig, TransactionDocument } from '../types';
 import ExperticketService from '../services/experticketService';
 
 /**
- * Hook for retrieving document links for a specific transaction.
+ * Retrieves and manages document links for a specific transaction.
  *
  * @param config - The Experticket API configuration.
  * @returns An object containing the document list, loading/error states, and a fetch function.
@@ -17,13 +17,13 @@ import ExperticketService from '../services/experticketService';
 export const useDocuments = (config: ExperticketConfig) => {
   const [loading, setLoading] = useState(false);
   const [documents, setDocuments] = useState<TransactionDocument[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const service = useMemo(() => new ExperticketService(config), [config]);
 
   /**
    * Fetches document links (e.g., tickets) for the given transaction identifier.
-   *
+   * @internal
    * @param transactionId - The unique identifier of the transaction.
    */
   const fetchDocuments = useCallback(async (transactionId: string) => {
@@ -31,12 +31,12 @@ export const useDocuments = (config: ExperticketConfig) => {
 
     try {
       setLoading(true);
-      setError(null);
+      setErrorMessage('');
       const response = await service.getTransactionDocuments(transactionId);
       setDocuments(response.Documents || []);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch documents';
-      setError(errorMessage);
+      const message = error instanceof Error ? error.message : 'Failed to fetch documents';
+      setErrorMessage(message);
       setDocuments([]);
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ export const useDocuments = (config: ExperticketConfig) => {
   return {
     documents,
     loading,
-    error,
+    errorMessage,
     fetchDocuments
   };
 };
