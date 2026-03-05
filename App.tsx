@@ -35,7 +35,7 @@ const App: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-6">
             <div className="max-w-6xl mx-auto">
               <Routes>
-                <Route path="/" element={<DashboardView config={config} />} />
+                <Route path="/" element={<DashboardView />} />
                 <Route path="/new-sale" element={<NewSaleWizard config={config} />} />
                 <Route path="/transactions" element={<TransactionManager config={config} />} />
                 <Route path="/documents" element={<DocumentsPanel config={config} />} />

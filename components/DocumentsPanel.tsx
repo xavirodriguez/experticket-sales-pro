@@ -11,7 +11,7 @@ interface DocumentsPanelProps {
 }
 
 const DocumentsPanel: React.FC<DocumentsPanelProps> = ({ config }) => {
-  const { documents, loading, error, fetchDocuments } = useDocuments(config);
+  const { documents, loading, errorMessage, fetchDocuments } = useDocuments(config);
   const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearch = async (id: string) => {
@@ -31,12 +31,12 @@ const DocumentsPanel: React.FC<DocumentsPanelProps> = ({ config }) => {
         loading={loading}
       />
 
-      {error && (
+      {errorMessage && (
         <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 flex items-center space-x-3">
           <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
             <XCircle size={18} />
           </div>
-          <p className="font-medium text-sm">{error}</p>
+          <p className="font-medium text-sm">{errorMessage}</p>
         </div>
       )}
 

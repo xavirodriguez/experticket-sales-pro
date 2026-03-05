@@ -13,7 +13,8 @@ import {
   TransactionDocumentsResponse,
   RealTimePriceSearchParams,
   TransactionCreationParams,
-  CancellationSubmissionParams
+  CancellationSubmissionParams,
+  ReservationCreationParams
 } from '../types';
 
 const INCLUDE_PRICES_TRUE = 'true';
@@ -47,7 +48,7 @@ interface RequestConfig {
 }
 
 /**
- * Service class for interacting with the Experticket API.
+ * Interacts with the Experticket API for sales and transaction management.
  *
  * @remarks
  * This service handles all communication with the Experticket backend, including
@@ -144,26 +145,29 @@ class ExperticketService {
   /**
    * Creates a temporary reservation for one or more products.
    *
-   * @param reservationPayload - The reservation details.
+   * @param params - The reservation details.
    * @returns A promise that resolves to the reservation details.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
    */
-  async createReservation(reservationPayload: { AccessDateTime: string; Products: { ProductId: string; Quantity: number }[] }): Promise<ReservationResponse> {
-    return this.post<ReservationResponse>('/reservation', reservationPayload);
+  async createReservation(params: ReservationCreationParams): Promise<ReservationResponse> {
+    return this.post<ReservationResponse>('/reservation', {
+      AccessDateTime: params.accessDateTime,
+      Products: params.products
+    });
   }
 
   /**
    * Finalizes a transaction from an existing reservation.
    *
-   * @param transactionParams - The parameters required to create the transaction.
+   * @param params - The parameters required to create the transaction.
    * @returns A promise that resolves to the API response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
    */
-  async createTransaction(transactionParams: TransactionCreationParams): Promise<ApiResponse> {
+  async createTransaction(params: TransactionCreationParams): Promise<ApiResponse> {
     return this.post<ApiResponse>('/transaction', {
-      ReservationId: transactionParams.reservationId,
-      AccessDateTime: transactionParams.accessDate,
-      Products: transactionParams.products
+      ReservationId: params.reservationId,
+      AccessDateTime: params.accessDate,
+      Products: params.products
     });
   }
 
@@ -204,15 +208,15 @@ class ExperticketService {
   /**
    * Submits a request to cancel a specific sale/transaction.
    *
-   * @param cancellationParams - The cancellation details.
+   * @param params - The cancellation details.
    * @returns A promise that resolves to the API response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
    */
-  async submitCancellation(cancellationParams: CancellationSubmissionParams): Promise<ApiResponse> {
+  async submitCancellation(params: CancellationSubmissionParams): Promise<ApiResponse> {
     return this.post<ApiResponse>('/cancellationrequest', {
-      SaleId: cancellationParams.saleId,
-      Reason: cancellationParams.reason,
-      ReasonComments: cancellationParams.comments || ''
+      SaleId: params.saleId,
+      Reason: params.reason,
+      ReasonComments: params.comments || ''
     });
   }
 

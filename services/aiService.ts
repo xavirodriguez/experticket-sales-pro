@@ -4,7 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Experticket platform. You help agents understand ticketing terminology, provider rules, and the sales flow (Capacity -> Price -> Reservation -> Transaction). Keep answers professional, concise, and helpful.";
 
 /**
- * Service for interacting with the Google Gemini AI model.
+ * Interacts with the Google Gemini AI model for sales assistance.
  *
  * @remarks
  * This service provides assistance to sales agents by answering questions
@@ -17,6 +17,11 @@ export class AiService {
    * @param userPrompt - The question or message from the sales agent.
    * @returns A promise that resolves to the text response from the AI.
    * @throws Error If the Gemini API key is not configured or the AI service request fails.
+   *
+   * @example
+   * ```typescript
+   * const response = await AiService.fetchResponse("What is a reservation expiry?");
+   * ```
    */
   static async fetchResponse(userPrompt: string): Promise<string> {
     const apiKey = this.getApiKey();

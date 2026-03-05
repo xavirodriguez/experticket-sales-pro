@@ -4,7 +4,7 @@ import { ExperticketConfig, Transaction } from '../types';
 import ExperticketService from '../services/experticketService';
 
 /**
- * Hook for fetching and filtering sales transactions.
+ * Fetches and filters sales transactions for the dashboard.
  *
  * @param config - The Experticket API configuration.
  * @returns An object containing the transaction list, loading state, search functionality, and refresh function.
@@ -23,6 +23,7 @@ export const useTransactions = (config: ExperticketConfig) => {
 
   /**
    * Fetches the latest transactions from the API.
+   * @internal
    */
   const fetchTransactions = useCallback(async () => {
     if (!config.apiKey) return;
@@ -45,7 +46,7 @@ export const useTransactions = (config: ExperticketConfig) => {
 
   /**
    * Memoized list of transactions filtered by the search term.
-   * Filters by TransactionId or ProductName.
+   * @internal
    */
   const filteredTransactions = useMemo(() => {
     const searchToken = searchTerm.toLowerCase();
