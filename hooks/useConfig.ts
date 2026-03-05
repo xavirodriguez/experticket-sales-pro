@@ -8,6 +8,10 @@ const STORAGE_KEYS = {
   BASE_URL: 'baseUrl'
 };
 
+/**
+ * Retrieves the initial configuration from localStorage or defaults.
+ * @internal
+ */
 const getInitialConfig = (): ExperticketConfig => ({
   partnerId: localStorage.getItem(STORAGE_KEYS.PARTNER_ID) || '',
   apiKey: localStorage.getItem(STORAGE_KEYS.API_KEY) || '',
@@ -16,6 +20,16 @@ const getInitialConfig = (): ExperticketConfig => ({
   isTest: true
 });
 
+/**
+ * Hook for managing the Experticket API configuration and its persistence in localStorage.
+ *
+ * @returns An object containing the current configuration and a function to update it.
+ *
+ * @example
+ * ```tsx
+ * const { config, updateConfig } = useConfig();
+ * ```
+ */
 export const useConfig = () => {
   const [config, setConfig] = useState<ExperticketConfig>(getInitialConfig);
 
@@ -25,6 +39,11 @@ export const useConfig = () => {
     localStorage.setItem(STORAGE_KEYS.BASE_URL, config.baseUrl);
   }, [config]);
 
+  /**
+   * Updates the current configuration.
+   *
+   * @param newConfig - The new configuration settings.
+   */
   const updateConfig = useCallback((newConfig: ExperticketConfig) => {
     setConfig(newConfig);
   }, []);

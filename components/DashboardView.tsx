@@ -4,19 +4,45 @@ import { Link } from 'react-router-dom';
 import { ShoppingBag, History, FileText } from 'lucide-react';
 import { ExperticketConfig } from '../types';
 
+/**
+ * Visual color mapping for dashboard cards.
+ * @internal
+ */
 const COLOR_CLASSES: Record<string, string> = {
   blue: 'bg-blue-50 text-blue-600',
   green: 'bg-green-50 text-green-600',
   purple: 'bg-purple-50 text-purple-600',
 };
 
+/**
+ * Text color mapping for dashboard card trends.
+ * @internal
+ */
 const TEXT_COLORS: Record<string, string> = {
   blue: 'text-blue-600',
   green: 'text-green-600',
   purple: 'text-gray-400',
 };
 
-const DashboardView: React.FC<{ config: ExperticketConfig }> = () => (
+/**
+ * Props for the {@link DashboardView} component.
+ */
+interface DashboardViewProps {
+  /** The Experticket API configuration. */
+  config: ExperticketConfig;
+}
+
+/**
+ * The main dashboard view providing a high-level overview of sales activities.
+ *
+ * @param props - Component props.
+ *
+ * @example
+ * ```tsx
+ * <DashboardView config={config} />
+ * ```
+ */
+const DashboardView: React.FC<DashboardViewProps> = () => (
   <div className="space-y-6">
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <DashboardCard
@@ -59,13 +85,28 @@ const DashboardView: React.FC<{ config: ExperticketConfig }> = () => (
   </div>
 );
 
-const DashboardCard: React.FC<{
+/**
+ * Props for the {@link DashboardCard} component.
+ * @internal
+ */
+interface DashboardCardProps {
+  /** The icon to display in the card. */
   icon: React.ElementType;
+  /** The title of the metric. */
   title: string;
+  /** The current value of the metric. */
   value: string;
+  /** The trend text (e.g., "+5%"). */
   trend: string;
+  /** Color theme key for the card. */
   color: string;
-}> = ({ icon: Icon, title, value, trend, color }) => {
+}
+
+/**
+ * A reusable card component for displaying dashboard metrics.
+ * @internal
+ */
+const DashboardCard: React.FC<DashboardCardProps> = ({ icon: Icon, title, value, trend, color }) => {
   return (
     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
       <div className="flex items-center justify-between mb-4">

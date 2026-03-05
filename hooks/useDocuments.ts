@@ -3,6 +3,17 @@ import { useState, useMemo, useCallback } from 'react';
 import { ExperticketConfig, TransactionDocument } from '../types';
 import ExperticketService from '../services/experticketService';
 
+/**
+ * Hook for retrieving document links for a specific transaction.
+ *
+ * @param config - The Experticket API configuration.
+ * @returns An object containing the document list, loading/error states, and a fetch function.
+ *
+ * @example
+ * ```tsx
+ * const { documents, fetchDocuments, loading } = useDocuments(config);
+ * ```
+ */
 export const useDocuments = (config: ExperticketConfig) => {
   const [loading, setLoading] = useState(false);
   const [documents, setDocuments] = useState<TransactionDocument[]>([]);
@@ -10,6 +21,11 @@ export const useDocuments = (config: ExperticketConfig) => {
 
   const service = useMemo(() => new ExperticketService(config), [config]);
 
+  /**
+   * Fetches document links (e.g., tickets) for the given transaction identifier.
+   *
+   * @param transactionId - The unique identifier of the transaction.
+   */
   const fetchDocuments = useCallback(async (transactionId: string) => {
     if (!transactionId) return;
 

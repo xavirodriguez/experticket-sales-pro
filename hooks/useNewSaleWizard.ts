@@ -14,6 +14,22 @@ const INITIAL_STATE: SaleWizardState = {
   reservationExpiry: 0,
 };
 
+/**
+ * Manages the state and logic for the multi-step sale wizard.
+ *
+ * @remarks
+ * This hook coordinates the flow from product selection through capacity checking,
+ * reservation creation, and final transaction processing.
+ *
+ * @param config - The Experticket API configuration.
+ * @returns An object containing the current state, loading/error indicators,
+ *          data lists, and navigation/update functions.
+ *
+ * @example
+ * ```tsx
+ * const { state, goToNextStep, updateState } = useNewSaleWizard(config);
+ * ```
+ */
 export const useNewSaleWizard = (config: ExperticketConfig) => {
   const [state, setState] = useState<SaleWizardState>(INITIAL_STATE);
   const [loading, setLoading] = useState(false);
@@ -24,6 +40,9 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
 
   const service = useMemo(() => new ExperticketService(config), [config]);
 
+  /**
+   * Executes an asynchronous action with automatic loading and error state management.
+   */
   const executeAction = useCallback(async (action: () => Promise<void>) => {
     setLoading(true);
     setError(null);
@@ -37,6 +56,9 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     }
   }, []);
 
+  /**
+   * Loads initial data required for the wizard.
+   */
   const loadInitialData = useCallback(async () => {
     const [providersResponse, catalogResponse] = await Promise.all([
       service.getProviders(),
@@ -50,6 +72,9 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     executeAction(loadInitialData);
   }, [executeAction, loadInitialData]);
 
+  /**
+   * Handles product selection and transitions to the capacity check step.
+   */
   const handleProductSelection = useCallback(async () => {
     if (!state.selectedProductId) throw new Error('Please select a product');
 
@@ -58,6 +83,9 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     setState(prevState => ({ ...prevState, step: 2 }));
   }, [service, state.selectedProductId, state.accessDate]);
 
+  /**
+   * Creates a reservation and transitions to the reservation details step.
+   */
   const handleReservation = useCallback(async () => {
     const reservationResponse = await service.createReservation({
       AccessDateTime: state.accessDate,
@@ -71,6 +99,9 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     }));
   }, [service, state.accessDate, state.selectedProductId, state.quantity]);
 
+  /**
+   * Finalizes the transaction and transitions to the confirmation step.
+   */
   const handleTransaction = useCallback(async () => {
     await service.createTransaction({
       reservationId: state.reservationId,
@@ -80,6 +111,9 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     setState(prevState => ({ ...prevState, step: 4 }));
   }, [service, state.reservationId, state.accessDate, state.selectedProductId]);
 
+  /**
+   * Advances the wizard to the next step based on current progress.
+   */
   const goToNextStep = useCallback(() => executeAction(async () => {
     const stepActions: Record<number, () => Promise<void>> = {
       1: handleProductSelection,
@@ -91,16 +125,29 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
     if (action) await action();
   }), [state.step, executeAction, handleProductSelection, handleReservation, handleTransaction]);
 
+  /**
+   * Moves the wizard back to the previous step.
+   */
   const goToPreviousStep = useCallback(() => {
     setState(prevState => ({ ...prevState, step: Math.max(1, prevState.step - 1) }));
   }, []);
 
+  /**
+   * Resets the wizard state to its initial values.
+   */
   const resetWizard = useCallback(() => setState(INITIAL_STATE), []);
 
+  /**
+   * Updates specific fields in the wizard state.
+   * @param updates - Partial object containing fields to update.
+   */
   const updateState = useCallback((updates: Partial<SaleWizardState>) => {
     setState(prevState => ({ ...prevState, ...updates }));
   }, []);
 
+  /**
+   * Filtered list of products based on the selected provider.
+   */
   const filteredProducts = useMemo((): Product[] => {
     const products = catalog?.ProductBases?.flatMap(productBase => productBase.Products || []) || [];
     return products.filter(product => product.ProviderId === state.selectedProviderId);

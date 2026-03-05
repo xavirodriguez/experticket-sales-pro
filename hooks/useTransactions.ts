@@ -3,6 +3,17 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ExperticketConfig, Transaction } from '../types';
 import ExperticketService from '../services/experticketService';
 
+/**
+ * Hook for fetching and filtering sales transactions.
+ *
+ * @param config - The Experticket API configuration.
+ * @returns An object containing the transaction list, loading state, search functionality, and refresh function.
+ *
+ * @example
+ * ```tsx
+ * const { transactions, searchTerm, setSearchTerm, refresh } = useTransactions(config);
+ * ```
+ */
 export const useTransactions = (config: ExperticketConfig) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
@@ -10,6 +21,9 @@ export const useTransactions = (config: ExperticketConfig) => {
 
   const service = useMemo(() => new ExperticketService(config), [config]);
 
+  /**
+   * Fetches the latest transactions from the API.
+   */
   const fetchTransactions = useCallback(async () => {
     if (!config.apiKey) return;
 
@@ -29,6 +43,10 @@ export const useTransactions = (config: ExperticketConfig) => {
     fetchTransactions();
   }, [fetchTransactions]);
 
+  /**
+   * Memoized list of transactions filtered by the search term.
+   * Filters by TransactionId or ProductName.
+   */
   const filteredTransactions = useMemo(() => {
     const searchToken = searchTerm.toLowerCase();
     return transactions.filter(transaction =>
