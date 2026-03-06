@@ -23,7 +23,7 @@ interface WizardStepRendererProps {
   /** Function to update wizard state. */
   updateState: (updates: Partial<SaleWizardState>) => void;
   /** Current capacity information. */
-  capacityInfo: CapacityResponse | null;
+  capacityInfo: CapacityResponse | undefined;
   /** Callback to reset the wizard. */
   resetWizard: () => void;
   /** Callback to view transactions. */
@@ -46,38 +46,34 @@ const WizardStepRenderer: React.FC<WizardStepRendererProps> = ({
   resetWizard,
   onViewTransactions
 }) => {
-  switch (step) {
-    case 1:
-      return (
-        <ProductSelectionStep
-          providers={providers}
-          products={filteredProducts}
-          selectedProviderId={state.selectedProviderId}
-          selectedProductId={state.selectedProductId}
-          accessDate={state.accessDate}
-          quantity={state.quantity}
-          onUpdate={updateState}
-        />
-      );
-    case 2:
-      return <CapacityCheckStep capacityInfo={capacityInfo} />;
-    case 3:
-      return (
-        <ReservationStep
-          reservationId={state.reservationId}
-          reservationExpiry={state.reservationExpiry}
-        />
-      );
-    case 4:
-      return (
-        <SaleConfirmationStep
-          onNewBooking={resetWizard}
-          onViewTransactions={onViewTransactions}
-        />
-      );
-    default:
-      return null;
-  }
+  const stepComponents: Record<number, React.ReactElement> = {
+    1: (
+      <ProductSelectionStep
+        providers={providers}
+        products={filteredProducts}
+        selectedProviderId={state.selectedProviderId}
+        selectedProductId={state.selectedProductId}
+        accessDate={state.accessDate}
+        quantity={state.quantity}
+        onUpdate={updateState}
+      />
+    ),
+    2: <CapacityCheckStep capacityInfo={capacityInfo} />,
+    3: (
+      <ReservationStep
+        reservationId={state.reservationId}
+        reservationExpiry={state.reservationExpiry}
+      />
+    ),
+    4: (
+      <SaleConfirmationStep
+        onNewBooking={resetWizard}
+        onViewTransactions={onViewTransactions}
+      />
+    )
+  };
+
+  return stepComponents[step] || <></>;
 };
 
 export default WizardStepRenderer;

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CheckCircle2, Ticket, Calendar, UserCheck, CreditCard } from 'lucide-react';
 
 interface Step {
@@ -8,22 +8,22 @@ interface Step {
   icon: React.ElementType;
 }
 
-const STEPS: Step[] = [
-  { id: 1, name: 'Product', icon: Ticket },
-  { id: 2, name: 'Capacity & Price', icon: Calendar },
-  { id: 3, name: 'Reservation', icon: UserCheck },
-  { id: 4, name: 'Confirmation', icon: CreditCard },
-];
-
 interface WizardProgressBarProps {
   currentStep: number;
 }
 
 const WizardProgressBar: React.FC<WizardProgressBarProps> = ({ currentStep }) => {
+  const steps: Step[] = useMemo(() => [
+    { id: 1, name: 'Product', icon: Ticket },
+    { id: 2, name: 'Capacity & Price', icon: Calendar },
+    { id: 3, name: 'Reservation', icon: UserCheck },
+    { id: 4, name: 'Confirmation', icon: CreditCard },
+  ], []);
+
   return (
     <div className="border-b border-gray-100 bg-gray-50/50 p-6">
       <div className="flex items-center justify-between max-w-2xl mx-auto">
-        {STEPS.map((step, idx) => {
+        {steps.map((step, idx) => {
           const Icon = step.icon;
           const isCompleted = currentStep > step.id;
           const isActive = currentStep === step.id;
@@ -41,7 +41,7 @@ const WizardProgressBar: React.FC<WizardProgressBarProps> = ({ currentStep }) =>
                   {step.name}
                 </span>
               </div>
-              {idx < STEPS.length - 1 && (
+              {idx < steps.length - 1 && (
                 <div className="flex-1 h-0.5 bg-gray-200 mx-4 -mt-6" />
               )}
             </React.Fragment>

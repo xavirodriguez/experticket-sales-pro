@@ -50,7 +50,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ documents, hasSearched }) =
     );
   }
 
-  return null;
+  return <></>;
 };
 
 export default DocumentList;
