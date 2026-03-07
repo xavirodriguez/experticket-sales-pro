@@ -19,7 +19,7 @@ export const useDocuments = (config: ExperticketConfig) => {
   const [documents, setDocuments] = useState<TransactionDocument[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const service = useMemo(() => new ExperticketService(config), [config]);
+  const experticketService = useMemo(() => new ExperticketService(config), [config]);
 
   /**
    * Fetches document links (e.g., tickets) for the given transaction identifier.
@@ -32,7 +32,7 @@ export const useDocuments = (config: ExperticketConfig) => {
     try {
       setLoading(true);
       setErrorMessage('');
-      const response = await service.getTransactionDocuments(transactionId);
+      const response = await experticketService.getTransactionDocuments(transactionId);
       setDocuments(response.Documents || []);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to fetch documents';
@@ -41,7 +41,7 @@ export const useDocuments = (config: ExperticketConfig) => {
     } finally {
       setLoading(false);
     }
-  }, [service]);
+  }, [experticketService]);
 
   return {
     documents,

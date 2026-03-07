@@ -19,7 +19,8 @@ const INITIAL_STATE: SaleWizardState = {
  *
  * @remarks
  * This hook coordinates the flow from product selection through capacity checking,
- * reservation creation, and final transaction processing.
+ * reservation creation, and final transaction processing. It adheres to the 'No Null'
+ * principle by using `undefined` for optional data.
  *
  * @param config - The Experticket API configuration.
  * @returns An object containing the current state, loading/error indicators,
@@ -38,7 +39,7 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
   const [catalog, setCatalog] = useState<CatalogResponse | undefined>(undefined);
   const [capacityInfo, setCapacityInfo] = useState<CapacityResponse | undefined>(undefined);
 
-  const service = useMemo(() => new ExperticketService(config), [config]);
+  const experticketService = useMemo(() => new ExperticketService(config), [config]);
 
   /**
    * Executes an asynchronous action with automatic loading and error state management.
@@ -63,12 +64,12 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
    */
   const loadInitialData = useCallback(async () => {
     const [providersResponse, catalogResponse] = await Promise.all([
-      service.getProviders(),
-      service.getCatalog()
+      experticketService.getProviders(),
+      experticketService.getCatalog()
     ]);
     setProviders(providersResponse.Providers || []);
     setCatalog(catalogResponse);
-  }, [service]);
+  }, [experticketService]);
 
   useEffect(() => {
     executeAction(loadInitialData);
@@ -81,17 +82,17 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
   const handleProductSelection = useCallback(async () => {
     if (!state.selectedProductId) throw new Error('Please select a product');
 
-    const capacity = await service.checkCapacity([state.selectedProductId], [state.accessDate]);
+    const capacity = await experticketService.checkCapacity([state.selectedProductId], [state.accessDate]);
     setCapacityInfo(capacity);
     setState(prevState => ({ ...prevState, step: 2 }));
-  }, [service, state.selectedProductId, state.accessDate]);
+  }, [experticketService, state.selectedProductId, state.accessDate]);
 
   /**
    * Creates a reservation and transitions to the reservation details step.
    * @internal
    */
   const handleReservation = useCallback(async () => {
-    const reservationResponse = await service.createReservation({
+    const reservationResponse = await experticketService.createReservation({
       accessDateTime: state.accessDate,
       products: [{ ProductId: state.selectedProductId, Quantity: state.quantity }]
     });
@@ -101,20 +102,20 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
       reservationId: reservationResponse.ReservationId,
       reservationExpiry: reservationResponse.MinutesToExpiry
     }));
-  }, [service, state.accessDate, state.selectedProductId, state.quantity]);
+  }, [experticketService, state.accessDate, state.selectedProductId, state.quantity]);
 
   /**
    * Finalizes the transaction and transitions to the confirmation step.
    * @internal
    */
   const handleTransaction = useCallback(async () => {
-    await service.createTransaction({
+    await experticketService.createTransaction({
       reservationId: state.reservationId,
       accessDate: state.accessDate,
       products: [{ ProductId: state.selectedProductId }]
     });
     setState(prevState => ({ ...prevState, step: 4 }));
-  }, [service, state.reservationId, state.accessDate, state.selectedProductId]);
+  }, [experticketService, state.reservationId, state.accessDate, state.selectedProductId]);
 
   /**
    * Action mapping for each step in the wizard.
