@@ -4,11 +4,11 @@ import { CapacityResponse } from '../../types';
 import { CheckCircle2 } from 'lucide-react';
 
 interface CapacityCheckStepProps {
-  capacityInfo: CapacityResponse | null;
+  capacityInfo: CapacityResponse | undefined;
 }
 
 const CapacityCheckStep: React.FC<CapacityCheckStepProps> = ({ capacityInfo }) => {
-  if (!capacityInfo) return null;
+  if (!capacityInfo) return <></>;
 
   const productCapacity = capacityInfo.Products?.[0];
 

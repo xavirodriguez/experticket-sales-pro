@@ -117,18 +117,22 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
   }, [service, state.reservationId, state.accessDate, state.selectedProductId]);
 
   /**
+   * Action mapping for each step in the wizard.
+   * @internal
+   */
+  const stepActions: Record<number, () => Promise<void>> = useMemo(() => ({
+    1: handleProductSelection,
+    2: handleReservation,
+    3: handleTransaction
+  }), [handleProductSelection, handleReservation, handleTransaction]);
+
+  /**
    * Advances the wizard to the next step based on current progress.
    */
   const goToNextStep = useCallback(() => executeAction(async () => {
-    const stepActions: Record<number, () => Promise<void>> = {
-      1: handleProductSelection,
-      2: handleReservation,
-      3: handleTransaction
-    };
-
     const action = stepActions[state.step];
     if (action) await action();
-  }), [state.step, executeAction, handleProductSelection, handleReservation, handleTransaction]);
+  }), [state.step, executeAction, stepActions]);
 
   /**
    * Moves the wizard back to the previous step.

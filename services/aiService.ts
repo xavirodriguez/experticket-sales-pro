@@ -43,8 +43,7 @@ export class AiService {
    * @throws Error if no API key is found in the environment.
    */
   private static getApiKey(): string {
-    const environment = import.meta as any;
-    const apiKey = environment.env?.VITE_GEMINI_API_KEY ||
+    const apiKey = (import.meta as ImportMeta).env?.VITE_GEMINI_API_KEY ||
                    process.env?.GEMINI_API_KEY ||
                    process.env?.API_KEY;
 
