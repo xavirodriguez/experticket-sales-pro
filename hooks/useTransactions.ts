@@ -19,7 +19,7 @@ export const useTransactions = (config: ExperticketConfig) => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const service = useMemo(() => new ExperticketService(config), [config]);
+  const experticketService = useMemo(() => new ExperticketService(config), [config]);
 
   /**
    * Fetches the latest transactions from the API.
@@ -30,7 +30,7 @@ export const useTransactions = (config: ExperticketConfig) => {
 
     try {
       setLoading(true);
-      const response = await service.getTransactions({ PageSize: 50 });
+      const response = await experticketService.getTransactions({ PageSize: 50 });
       setTransactions(response.Transactions || []);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch transactions';
@@ -38,7 +38,7 @@ export const useTransactions = (config: ExperticketConfig) => {
     } finally {
       setLoading(false);
     }
-  }, [service, config.apiKey]);
+  }, [experticketService, config.apiKey]);
 
   useEffect(() => {
     fetchTransactions();

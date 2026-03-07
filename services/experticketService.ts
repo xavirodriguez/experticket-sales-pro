@@ -66,6 +66,10 @@ class ExperticketService {
    *
    * @returns A promise that resolves to the languages response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * const languages = await service.getLanguages();
+   * ```
    */
   async getLanguages(): Promise<LanguagesResponse> {
     return this.request<LanguagesResponse>({
@@ -79,6 +83,10 @@ class ExperticketService {
    *
    * @returns A promise that resolves to the providers response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * const providers = await service.getProviders();
+   * ```
    */
   async getProviders(): Promise<ProvidersResponse> {
     return this.request<ProvidersResponse>({
@@ -95,6 +103,10 @@ class ExperticketService {
    *
    * @returns A promise that resolves to the catalog response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * const catalog = await service.getCatalog();
+   * ```
    */
   async getCatalog(): Promise<CatalogResponse> {
     return this.request<CatalogResponse>({
@@ -113,6 +125,10 @@ class ExperticketService {
    * @param dates - Array of dates in YYYY-MM-DD format.
    * @returns A promise that resolves to the capacity information.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * const capacity = await service.checkCapacity(['p1', 'p2'], ['2024-01-01']);
+   * ```
    */
   async checkCapacity(productIds: string[], dates: string[]): Promise<CapacityResponse> {
     return this.request<CapacityResponse>({
@@ -132,6 +148,14 @@ class ExperticketService {
    * @param searchParams - The search criteria including product IDs and date range.
    * @returns A promise that resolves to the real-time price response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * const prices = await service.getRealTimePrices({
+   *   productIds: ['p1'],
+   *   startDate: '2024-01-01',
+   *   endDate: '2024-01-07'
+   * });
+   * ```
    */
   async getRealTimePrices(searchParams: RealTimePriceSearchParams): Promise<RealTimePriceResponse> {
     return this.post<RealTimePriceResponse>('/RealTimePrices', {
@@ -148,6 +172,13 @@ class ExperticketService {
    * @param params - The reservation details.
    * @returns A promise that resolves to the reservation details.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * const reservation = await service.createReservation({
+   *   accessDateTime: '2024-01-01T10:00:00',
+   *   products: [{ ProductId: 'p1', Quantity: 2 }]
+   * });
+   * ```
    */
   async createReservation(params: ReservationCreationParams): Promise<ReservationResponse> {
     return this.post<ReservationResponse>('/reservation', {
@@ -162,6 +193,14 @@ class ExperticketService {
    * @param params - The parameters required to create the transaction.
    * @returns A promise that resolves to the API response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * await service.createTransaction({
+   *   reservationId: 'res123',
+   *   accessDate: '2024-01-01',
+   *   products: [{ ProductId: 'p1' }]
+   * });
+   * ```
    */
   async createTransaction(params: TransactionCreationParams): Promise<ApiResponse> {
     return this.post<ApiResponse>('/transaction', {
@@ -177,6 +216,10 @@ class ExperticketService {
    * @param searchParams - Optional filters for the transaction list.
    * @returns A promise that resolves to the transactions response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * const transactions = await service.getTransactions({ PageSize: 10 });
+   * ```
    */
   async getTransactions(searchParams: Record<string, string | number> = {}): Promise<TransactionsResponse> {
     return this.request<TransactionsResponse>({
@@ -194,6 +237,10 @@ class ExperticketService {
    * @param searchParams - Optional filters for the cancellation requests list.
    * @returns A promise that resolves to the cancellation requests response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * const requests = await service.getCancellationRequests({ Status: 0 });
+   * ```
    */
   async getCancellationRequests(searchParams: Record<string, string | number> = {}): Promise<CancellationRequestsResponse> {
     return this.request<CancellationRequestsResponse>({
@@ -211,6 +258,14 @@ class ExperticketService {
    * @param params - The cancellation details.
    * @returns A promise that resolves to the API response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * await service.submitCancellation({
+   *   saleId: 'sale123',
+   *   reason: 1,
+   *   comments: 'Customer requested change'
+   * });
+   * ```
    */
   async submitCancellation(params: CancellationSubmissionParams): Promise<ApiResponse> {
     return this.post<ApiResponse>('/cancellationrequest', {
@@ -226,6 +281,10 @@ class ExperticketService {
    * @param transactionId - The unique identifier of the transaction.
    * @returns A promise that resolves to the transaction documents response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   * @example
+   * ```typescript
+   * const docs = await service.getTransactionDocuments('sale123');
+   * ```
    */
   async getTransactionDocuments(transactionId: string): Promise<TransactionDocumentsResponse> {
     return this.request<TransactionDocumentsResponse>({

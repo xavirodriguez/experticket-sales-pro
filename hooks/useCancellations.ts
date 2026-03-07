@@ -19,7 +19,7 @@ export const useCancellations = (config: ExperticketConfig) => {
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const service = useMemo(() => new ExperticketService(config), [config]);
+  const experticketService = useMemo(() => new ExperticketService(config), [config]);
 
   /**
    * Fetches the latest cancellation requests from the API.
@@ -30,7 +30,7 @@ export const useCancellations = (config: ExperticketConfig) => {
 
     try {
       setLoading(true);
-      const response = await service.getCancellationRequests({ PageSize: 20 });
+      const response = await experticketService.getCancellationRequests({ PageSize: 20 });
       setRequests(response.CancellationRequests || []);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch cancellation requests';
@@ -38,7 +38,7 @@ export const useCancellations = (config: ExperticketConfig) => {
     } finally {
       setLoading(false);
     }
-  }, [service, config.apiKey]);
+  }, [experticketService, config.apiKey]);
 
   /**
    * Submits a new cancellation request for a specific sale.
@@ -51,14 +51,15 @@ export const useCancellations = (config: ExperticketConfig) => {
   const submitCancellation = useCallback(async (saleId: string, reason: number, comments: string) => {
     try {
       setIsSubmitting(true);
-      await service.submitCancellation({ saleId, reason, comments });
+      await experticketService.submitCancellation({ saleId, reason, comments });
       await fetchRequests();
     } catch (error: unknown) {
-      throw error;
+      const errorMessage = error instanceof Error ? error.message : 'Cancellation submission failed';
+      throw new Error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
-  }, [service, fetchRequests]);
+  }, [experticketService, fetchRequests]);
 
   useEffect(() => {
     fetchRequests();
