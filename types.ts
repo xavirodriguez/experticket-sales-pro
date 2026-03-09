@@ -297,6 +297,22 @@ export interface Transaction {
 }
 
 /**
+ * Filters for searching transactions.
+ */
+export interface TransactionSearchParams {
+  /** The unique identifier of a specific transaction. */
+  TransactionId?: string;
+  /** Filter transactions by a specific product ID. */
+  ProductId?: string;
+  /** Filter transactions by a specific provider ID. */
+  ProviderId?: string;
+  /** The number of records to return per page. */
+  PageSize?: number;
+  /** The zero-based page index. */
+  PageIndex?: number;
+}
+
+/**
  * Response containing a list of transactions.
  */
 export interface TransactionsResponse extends ApiResponse {
@@ -304,6 +320,20 @@ export interface TransactionsResponse extends ApiResponse {
   Transactions: Transaction[];
   /** Total number of records available in the system. */
   TotalCount: number;
+}
+
+/**
+ * Filters for searching cancellation requests.
+ */
+export interface CancellationSearchParams {
+  /** Filter by a specific sale/transaction ID. */
+  SaleId?: string;
+  /** Filter by request status (0: Pending, 1: Approved, 2: Rejected). */
+  Status?: number;
+  /** The number of records to return per page. */
+  PageSize?: number;
+  /** The zero-based page index. */
+  PageIndex?: number;
 }
 
 /**

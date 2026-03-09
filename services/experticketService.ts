@@ -14,7 +14,9 @@ import {
   RealTimePriceSearchParams,
   TransactionCreationParams,
   CancellationSubmissionParams,
-  ReservationCreationParams
+  ReservationCreationParams,
+  TransactionSearchParams,
+  CancellationSearchParams
 } from '../types';
 
 const INCLUDE_PRICES_TRUE = 'true';
@@ -221,12 +223,12 @@ class ExperticketService {
    * const transactions = await service.getTransactions({ PageSize: 10 });
    * ```
    */
-  async getTransactions(searchParams: Record<string, string | number> = {}): Promise<TransactionsResponse> {
+  async getTransactions(searchParams: TransactionSearchParams = {}): Promise<TransactionsResponse> {
     return this.request<TransactionsResponse>({
       endpoint: '/transaction',
       params: {
         ApiKey: this.config.apiKey,
-        ...searchParams
+        ...(searchParams as Record<string, string | number>)
       }
     });
   }
@@ -242,12 +244,12 @@ class ExperticketService {
    * const requests = await service.getCancellationRequests({ Status: 0 });
    * ```
    */
-  async getCancellationRequests(searchParams: Record<string, string | number> = {}): Promise<CancellationRequestsResponse> {
+  async getCancellationRequests(searchParams: CancellationSearchParams = {}): Promise<CancellationRequestsResponse> {
     return this.request<CancellationRequestsResponse>({
       endpoint: '/cancellationrequest',
       params: {
         ApiKey: this.config.apiKey,
-        ...searchParams
+        ...(searchParams as Record<string, string | number>)
       }
     });
   }
@@ -339,9 +341,9 @@ class ExperticketService {
    */
   private buildUrl(endpoint: string, params: Record<string, string | number>): URL {
     const url = new URL(`https://${this.config.baseUrl}${endpoint}`);
-    Object.entries(params).forEach(([key, value]) => {
-      url.searchParams.append(key, String(value));
-    });
+    Object.entries(params).forEach(([key, value]) =>
+      url.searchParams.append(key, String(value))
+    );
     return url;
   }
 
@@ -363,11 +365,10 @@ class ExperticketService {
    * @internal
    */
   private async parseResponse<T>(response: Response): Promise<T> {
-    try {
-      return await response.json();
-    } catch {
+    const data = await response.json().catch(() => {
       throw new ExperticketApiError('Failed to parse API response');
-    }
+    });
+    return data as T;
   }
 
   /**
