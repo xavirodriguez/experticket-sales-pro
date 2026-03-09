@@ -1,10 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useAssistant } from '../hooks/useAssistant';
 import ToggleButton from './assistant/ToggleButton';
-import AssistantHeader from './assistant/AssistantHeader';
-import AssistantMessages from './assistant/AssistantMessages';
-import AssistantInput from './assistant/AssistantInput';
+import AssistantModal from './assistant/AssistantModal';
 
 /**
  * An AI-powered sales assistant component.
@@ -23,32 +21,29 @@ const Assistant: React.FC = () => {
   const [userPrompt, setUserPrompt] = useState('');
   const { messages, isLoading, sendMessage } = useAssistant();
 
-  /**
-   * Handles sending the user prompt to the AI service.
-   * @internal
-   */
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (!userPrompt.trim()) return;
     const currentPrompt = userPrompt;
     setUserPrompt('');
     await sendMessage(currentPrompt);
-  };
+  }, [userPrompt, sendMessage]);
+
+  const toggleOpen = useCallback(() => setIsOpen(prev => !prev), []);
+  const closeAssistant = useCallback(() => setIsOpen(false), []);
 
   return (
     <div className="relative">
-      <ToggleButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
+      <ToggleButton isOpen={isOpen} onClick={toggleOpen} />
 
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <AssistantHeader onClose={() => setIsOpen(false)} />
-          <AssistantMessages messages={messages} isLoading={isLoading} />
-          <AssistantInput
-            prompt={userPrompt}
-            setPrompt={setUserPrompt}
-            onSend={handleSend}
-            isLoading={isLoading}
-          />
-        </div>
+        <AssistantModal
+          messages={messages}
+          isLoading={isLoading}
+          userPrompt={userPrompt}
+          setUserPrompt={setUserPrompt}
+          onSend={handleSend}
+          onClose={closeAssistant}
+        />
       )}
     </div>
   );
