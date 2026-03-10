@@ -14,7 +14,9 @@ import {
   RealTimePriceSearchParams,
   TransactionCreationParams,
   CancellationSubmissionParams,
-  ReservationCreationParams
+  ReservationCreationParams,
+  TransactionSearchParams,
+  CancellationSearchParams
 } from '../types';
 
 const INCLUDE_PRICES_TRUE = 'true';
@@ -221,12 +223,12 @@ class ExperticketService {
    * const transactions = await service.getTransactions({ PageSize: 10 });
    * ```
    */
-  async getTransactions(searchParams: Record<string, string | number> = {}): Promise<TransactionsResponse> {
+  async getTransactions(searchParams: TransactionSearchParams = {}): Promise<TransactionsResponse> {
     return this.request<TransactionsResponse>({
       endpoint: '/transaction',
       params: {
         ApiKey: this.config.apiKey,
-        ...searchParams
+        ...(searchParams as Record<string, string | number>)
       }
     });
   }
@@ -242,12 +244,12 @@ class ExperticketService {
    * const requests = await service.getCancellationRequests({ Status: 0 });
    * ```
    */
-  async getCancellationRequests(searchParams: Record<string, string | number> = {}): Promise<CancellationRequestsResponse> {
+  async getCancellationRequests(searchParams: CancellationSearchParams = {}): Promise<CancellationRequestsResponse> {
     return this.request<CancellationRequestsResponse>({
       endpoint: '/cancellationrequest',
       params: {
         ApiKey: this.config.apiKey,
-        ...searchParams
+        ...(searchParams as Record<string, string | number>)
       }
     });
   }

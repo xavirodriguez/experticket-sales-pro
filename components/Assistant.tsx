@@ -15,7 +15,9 @@ import AssistantInput from './assistant/AssistantInput';
  *
  * @example
  * ```tsx
- * <Assistant />
+ * <header>
+ *   <Assistant />
+ * </header>
  * ```
  */
 const Assistant: React.FC = () => {

@@ -11,7 +11,9 @@ import DashboardMetrics from './dashboard/DashboardMetrics';
  *
  * @example
  * ```tsx
- * <DashboardView />
+ * <main>
+ *   <DashboardView />
+ * </main>
  * ```
  */
 const DashboardView: React.FC = () => (
