@@ -21,19 +21,30 @@ export class AiService {
    * @example
    * ```typescript
    * const response = await AiService.fetchResponse("What is a reservation expiry?");
+   * console.log(response); // "A reservation expiry is the amount of time in minutes..."
    * ```
    */
   static async fetchResponse(userPrompt: string): Promise<string> {
     const apiKey = this.getApiKey();
     const generativeAI = new GoogleGenAI(apiKey);
-    const aiModel = generativeAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      systemInstruction: SYSTEM_INSTRUCTION
-    });
+    const aiModel = this.getAiModel(generativeAI);
 
     const generationResult = await aiModel.generateContent(userPrompt);
     const aiResponse = await generationResult.response;
     return aiResponse.text();
+  }
+
+  /**
+   * Configures and retrieves the Gemini AI model instance.
+   * @internal
+   * @param generativeAI - The Google GenAI client instance.
+   * @returns The configured generative model.
+   */
+  private static getAiModel(generativeAI: GoogleGenAI) {
+    return generativeAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      systemInstruction: SYSTEM_INSTRUCTION
+    });
   }
 
   /**
