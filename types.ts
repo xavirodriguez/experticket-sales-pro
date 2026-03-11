@@ -1,14 +1,24 @@
 /**
  * Configuration settings for the Experticket API client.
+ *
+ * @remarks
+ * This configuration is typically persisted in local storage and used to
+ * initialize the service layer.
  */
 export interface ExperticketConfig {
-  /** The unique identifier for the partner. */
+  /** The unique identifier for the partner assigned by Experticket. */
   partnerId: string;
-  /** The secret API key for authentication. */
+  /**
+   * The secret API key for authentication.
+   * @remarks This should be kept secure and handled with care in client-side applications.
+   */
   apiKey: string;
-  /** The base URL of the Experticket API (e.g., api.experticket.com). */
+  /** The base URL of the Experticket API (e.g., 'api.experticket.com'). */
   baseUrl: string;
-  /** The ISO 639-1 language code for localized content. */
+  /**
+   * The ISO 639-1 language code for localized content.
+   * @defaultValue 'en'
+   */
   languageCode: string;
   /** Whether to use the sandbox environment for transactions. */
   isTest: boolean;
@@ -16,6 +26,10 @@ export interface ExperticketConfig {
 
 /**
  * Common structure for all Experticket API responses.
+ *
+ * @remarks
+ * Every response from the Experticket API inherits from this interface to provide
+ * standardized error handling.
  */
 export interface ApiResponse {
   /** Indicates if the request was processed successfully. */
@@ -48,6 +62,9 @@ export interface LanguagesResponse extends ApiResponse {
 
 /**
  * Represents a ticket provider.
+ *
+ * @remarks
+ * Providers are entities that offer products through the Experticket platform.
  */
 export interface Provider {
   /** Unique identifier for the provider. */
@@ -68,6 +85,9 @@ export interface ProvidersResponse extends ApiResponse {
 
 /**
  * Represents an individual ticketable product.
+ *
+ * @remarks
+ * Products are grouped under product bases and belong to a specific provider.
  */
 export interface Product {
   /** Unique identifier for the product. */
@@ -80,7 +100,10 @@ export interface Product {
   ProductBaseId: string;
   /** The identifier of the provider offering this product. */
   ProviderId: string;
-  /** The retail price of the product. */
+  /**
+   * The retail price of the product.
+   * @remarks This may be null if prices are not included in the catalog request.
+   */
   Price?: number;
 }
 
@@ -122,7 +145,10 @@ export interface CapacityProduct {
   AvailableCapacity: number;
   /** Current price for this specific date, if applicable. */
   Price?: number;
-  /** Price mode indicator (e.g., fixed or variable). */
+  /**
+   * Price mode indicator.
+   * @remarks 0 for fixed, 1 for variable.
+   */
   PriceMode?: number;
 }
 
@@ -206,7 +232,7 @@ export interface ReservationProduct {
  * Parameters for creating a new reservation.
  */
 export interface ReservationCreationParams {
-  /** The intended date and time of access (YYYY-MM-DD or ISO). */
+  /** The intended date and time of access (YYYY-MM-DD or ISO 8601). */
   accessDateTime: string;
   /** List of products and quantities to reserve. */
   products: ReservationProduct[];
@@ -231,6 +257,9 @@ export interface ReservationRequest {
 
 /**
  * Response containing details of a created reservation.
+ *
+ * @remarks
+ * A reservation holds capacity for a limited time until it is confirmed by a transaction.
  */
 export interface ReservationResponse extends ApiResponse {
   /** Unique identifier for the reservation. */
@@ -247,7 +276,7 @@ export interface ReservationResponse extends ApiResponse {
 export interface TransactionCreationParams {
   /** The identifier of the active reservation. */
   reservationId: string;
-  /** The confirmed date and time of access. */
+  /** The confirmed date and time of access in YYYY-MM-DD format. */
   accessDate: string;
   /** List of products to include in the final transaction. */
   products: { ProductId: string }[];
@@ -287,7 +316,7 @@ export interface Transaction {
   TotalRetailPrice: number;
   /**
    * The total net price.
-   * @remarks This may differ from TotalRetailPrice if commissions are applied.
+   * @remarks This may differ from {@link Transaction.TotalRetailPrice} if commissions are applied.
    */
   TotalPrice?: number;
   /** Indicates if the transaction is currently valid. */
@@ -300,9 +329,15 @@ export interface Transaction {
  * Parameters for searching transactions.
  */
 export interface TransactionSearchParams {
-  /** The number of records to return per page. */
+  /**
+   * The number of records to return per page.
+   * @defaultValue 50
+   */
   PageSize?: number;
-  /** The page number to retrieve. */
+  /**
+   * The page number to retrieve.
+   * @defaultValue 1
+   */
   Page?: number;
   /** Filter by transaction identifier. */
   TransactionId?: string;
@@ -324,9 +359,15 @@ export interface TransactionsResponse extends ApiResponse {
  * Parameters for searching cancellation requests.
  */
 export interface CancellationSearchParams {
-  /** The number of records to return per page. */
+  /**
+   * The number of records to return per page.
+   * @defaultValue 50
+   */
   PageSize?: number;
-  /** The page number to retrieve. */
+  /**
+   * The page number to retrieve.
+   * @defaultValue 1
+   */
   Page?: number;
   /** Filter by cancellation status. */
   Status?: number;
@@ -360,12 +401,12 @@ export interface CancellationRequest {
   ReasonComments?: string;
   /**
    * The current status of the request.
-   * @remarks Common statuses include pending (0), approved (1), or rejected (2).
+   * @remarks 0: Pending, 1: Approved, 2: Rejected.
    */
   Status: number;
   /** Feedback or explanation from the processing system. */
   StatusComments?: string;
-  /** When the request was created. */
+  /** When the request was created in ISO 8601 format. */
   CreatedDateTime: string;
   /** Whether this request was made in test mode. */
   IsTest: boolean;

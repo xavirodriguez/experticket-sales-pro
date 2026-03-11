@@ -8,6 +8,7 @@ import DashboardMetrics from './dashboard/DashboardMetrics';
  *
  * @remarks
  * This view displays key performance metrics and a call to action to start a new sale.
+ * It is typically the entry point for sales agents.
  *
  * @example
  * ```tsx

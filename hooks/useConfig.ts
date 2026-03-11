@@ -2,6 +2,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ExperticketConfig } from '../types';
 
+/**
+ * Storage keys used for persisting configuration in localStorage.
+ * @internal
+ */
 const STORAGE_KEYS = {
   PARTNER_ID: 'partnerId',
   API_KEY: 'apiKey',
@@ -11,6 +15,7 @@ const STORAGE_KEYS = {
 /**
  * Retrieves the initial configuration from localStorage or defaults.
  * @internal
+ * @returns The initial ExperticketConfig object.
  */
 const getInitialConfig = (): ExperticketConfig => ({
   partnerId: localStorage.getItem(STORAGE_KEYS.PARTNER_ID) || '',
@@ -23,11 +28,24 @@ const getInitialConfig = (): ExperticketConfig => ({
 /**
  * Hook for managing the Experticket API configuration and its persistence in localStorage.
  *
+ * @remarks
+ * This hook provides a centralized way to manage API credentials and settings.
+ * Changes to the configuration are automatically synchronized with the browser's
+ * local storage.
+ *
  * @returns An object containing the current configuration and a function to update it.
  *
  * @example
  * ```tsx
- * const { config, updateConfig } = useConfig();
+ * function ConfigManager() {
+ *   const { config, updateConfig } = useConfig();
+ *   return (
+ *     <input
+ *       value={config.apiKey}
+ *       onChange={e => updateConfig({ ...config, apiKey: e.target.value })}
+ *     />
+ *   );
+ * }
  * ```
  */
 export const useConfig = () => {

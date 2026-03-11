@@ -6,14 +6,37 @@ import { XCircle } from 'lucide-react';
 import DocumentSearch from './documents/DocumentSearch';
 import DocumentList from './documents/DocumentList';
 
+/**
+ * Props for the {@link DocumentsPanel} component.
+ */
 interface DocumentsPanelProps {
+  /** The Experticket API configuration. */
   config: ExperticketConfig;
 }
 
+/**
+ * UI panel for searching and retrieving transaction documents.
+ *
+ * @remarks
+ * This component provides a search interface to find documents by transaction ID
+ * and displays a list of available downloads (e.g., tickets, vouchers).
+ *
+ * @param props - Component props.
+ *
+ * @example
+ * ```tsx
+ * <DocumentsPanel config={myConfig} />
+ * ```
+ */
 const DocumentsPanel: React.FC<DocumentsPanelProps> = ({ config }) => {
   const { documents, loading, errorMessage, fetchDocuments } = useDocuments(config);
   const [hasSearched, setHasSearched] = useState(false);
 
+  /**
+   * Handles the search request for transaction documents.
+   * @internal
+   * @param id - The transaction identifier.
+   */
   const handleSearch = async (id: string) => {
     await fetchDocuments(id);
     setHasSearched(true);

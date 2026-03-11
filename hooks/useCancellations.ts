@@ -6,12 +6,20 @@ import ExperticketService from '../services/experticketService';
 /**
  * Manages cancellation requests and their submission.
  *
+ * @remarks
+ * This hook handles fetching existing cancellation requests for a partner
+ * and provides a function to submit new requests for specific sales.
+ *
  * @param config - The Experticket API configuration.
  * @returns An object containing the list of requests, loading states, and a function to submit new cancellations.
  *
  * @example
  * ```tsx
- * const { requests, submitCancellation, loading } = useCancellations(config);
+ * function CancellationList({ config }) {
+ *   const { requests, loading, submitCancellation } = useCancellations(config);
+ *   if (loading) return <div>Loading...</div>;
+ *   return requests.map(r => <div key={r.CancellationRequestId}>{r.SaleId}</div>);
+ * }
  * ```
  */
 export const useCancellations = (config: ExperticketConfig) => {
@@ -44,8 +52,8 @@ export const useCancellations = (config: ExperticketConfig) => {
    * Submits a new cancellation request for a specific sale.
    *
    * @param saleId - The identifier of the sale to cancel.
-   * @param reason - The numeric reason code for cancellation.
-   * @param comments - Optional explanatory comments.
+   * @param reason - The numeric reason code for cancellation (e.g., from {@link CancellationReason}).
+   * @param comments - Optional explanatory comments from the agent.
    * @throws Error if the cancellation submission fails.
    */
   const submitCancellation = useCallback(async (saleId: string, reason: number, comments: string) => {
