@@ -2,12 +2,7 @@
 import React from 'react';
 import { Transaction } from '../../types';
 import { Search, Loader2 } from 'lucide-react';
-import TransactionIdCell from './cells/TransactionIdCell';
-import DateCell from './cells/DateCell';
-import ProductCell from './cells/ProductCell';
-import AmountCell from './cells/AmountCell';
-import StatusCell from './cells/StatusCell';
-import ActionCell from './cells/ActionCell';
+import TransactionRow from './TransactionRow';
 
 /**
  * Props for the {@link TransactionTable} component.
@@ -19,31 +14,6 @@ interface TransactionTableProps {
   /** Loading state indicator. */
   loading: boolean;
 }
-
-/**
- * Renders an individual row in the transaction table.
- *
- * @param props - Component props containing transaction data.
- * @internal
- */
-const TransactionRow: React.FC<{ transaction: Transaction }> = ({ transaction }) => {
-  const firstProduct = transaction.Products?.[0];
-  const amount = transaction.TotalRetailPrice || transaction.TotalPrice || 0;
-
-  return (
-    <tr className="hover:bg-gray-50/50 transition cursor-default">
-      <TransactionIdCell id={transaction.TransactionId} timestamp={transaction.TransactionDateTime} />
-      <DateCell date={transaction.AccessDateTime} />
-      <ProductCell
-        productName={firstProduct?.ProductName || 'Mixed Items'}
-        providerName={firstProduct?.ProviderName || ''}
-      />
-      <AmountCell amount={amount} />
-      <StatusCell />
-      <ActionCell />
-    </tr>
-  );
-};
 
 /**
  * A data table for displaying sales transactions with filtering and loading states.

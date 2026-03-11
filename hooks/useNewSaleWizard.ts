@@ -1,5 +1,5 @@
 
-import { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { ExperticketConfig, SaleWizardState, Product } from '../types';
 import ExperticketService from '../services/experticketService';
 import { useWizardData } from './useWizardData';

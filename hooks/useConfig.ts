@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ExperticketConfig } from '../types';
 
 const STORAGE_KEYS = {
@@ -10,9 +10,11 @@ const STORAGE_KEYS = {
 
 /**
  * Retrieves the initial configuration from localStorage or defaults.
+ *
+ * @returns The stored configuration or a default one.
  * @internal
  */
-const getInitialConfig = (): ExperticketConfig => ({
+const loadStoredConfig = (): ExperticketConfig => ({
   partnerId: localStorage.getItem(STORAGE_KEYS.PARTNER_ID) || '',
   apiKey: localStorage.getItem(STORAGE_KEYS.API_KEY) || '',
   baseUrl: localStorage.getItem(STORAGE_KEYS.BASE_URL) || '',
@@ -31,7 +33,7 @@ const getInitialConfig = (): ExperticketConfig => ({
  * ```
  */
 export const useConfig = () => {
-  const [config, setConfig] = useState<ExperticketConfig>(getInitialConfig);
+  const [config, setConfig] = useState<ExperticketConfig>(loadStoredConfig);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.PARTNER_ID, config.partnerId);
@@ -40,9 +42,9 @@ export const useConfig = () => {
   }, [config]);
 
   /**
-   * Updates the current configuration.
+   * Updates the current configuration with new values.
    *
-   * @param newConfig - The new configuration settings.
+   * @param newConfig - The new configuration settings object.
    */
   const updateConfig = useCallback((newConfig: ExperticketConfig) => {
     setConfig(newConfig);
