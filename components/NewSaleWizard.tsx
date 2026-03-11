@@ -20,10 +20,10 @@ interface NewSaleWizardProps {
  *
  * @remarks
  * This component guides the user through four distinct steps:
- * 1. Product Selection
- * 2. Capacity Check
- * 3. Reservation
- * 4. Confirmation
+ * 1. **Product Selection**: Choose provider and product.
+ * 2. **Capacity Check**: Verify availability for a given date.
+ * 3. **Reservation**: Create a temporary hold on capacity.
+ * 4. **Confirmation**: Finalize the transaction.
  *
  * @param props - Component props.
  *
