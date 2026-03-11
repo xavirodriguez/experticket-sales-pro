@@ -3,15 +3,42 @@ import React, { useState } from 'react';
 import { ExperticketConfig } from '../types';
 import { Save, ShieldCheck, AlertCircle, Globe, Key, Building2 } from 'lucide-react';
 
+/**
+ * Props for the {@link Settings} component.
+ */
 interface SettingsProps {
+  /** The current Experticket API configuration. */
   config: ExperticketConfig;
+  /** Callback function triggered when the configuration is updated. */
   onUpdate: (config: ExperticketConfig) => void;
 }
 
+/**
+ * UI component for managing API credentials and environment settings.
+ *
+ * @remarks
+ * This component allows agents to configure their Partner ID, API Key, and
+ * target environment (Base URL and Test Mode). It provides visual feedback
+ * during the saving process.
+ *
+ * @param props - Component props.
+ *
+ * @example
+ * ```tsx
+ * <Settings
+ *   config={currentConfig}
+ *   onUpdate={(newCfg) => console.log(newCfg)}
+ * />
+ * ```
+ */
 const Settings: React.FC<SettingsProps> = ({ config, onUpdate }) => {
   const [localConfig, setLocalConfig] = useState(config);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
+  /**
+   * Persists the local configuration changes.
+   * @internal
+   */
   const handleSave = () => {
     setStatus('saving');
     setTimeout(() => {

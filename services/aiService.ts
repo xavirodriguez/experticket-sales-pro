@@ -1,6 +1,10 @@
 
 import { GoogleGenAI } from '@google/genai';
 
+/**
+ * System instruction to guide the AI assistant's persona and behavior.
+ * @internal
+ */
 const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Experticket platform. You help agents understand ticketing terminology, provider rules, and the sales flow (Capacity -> Price -> Reservation -> Transaction). Keep answers professional, concise, and helpful.";
 
 /**
@@ -9,6 +13,7 @@ const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Ex
  * @remarks
  * This service provides assistance to sales agents by answering questions
  * related to the Experticket platform and its sales processes.
+ * It uses the Google Generative AI (Gemini) SDK.
  */
 export class AiService {
   /**

@@ -19,10 +19,18 @@ import {
   CancellationSearchParams
 } from '../types';
 
+/**
+ * Centralized constant for price inclusion flag in API requests.
+ * @internal
+ */
 const INCLUDE_PRICES_TRUE = 'true';
 
 /**
  * Custom error class for Experticket API related failures.
+ *
+ * @remarks
+ * This error is thrown when the API returns an unsuccessful status code (Success: false)
+ * or when a network-level error occurs.
  */
 export class ExperticketApiError extends Error {
   /**
@@ -55,6 +63,9 @@ interface RequestConfig {
  * @remarks
  * This service handles all communication with the Experticket backend, including
  * authentication via API keys and automatic injection of partner identifiers.
+ *
+ * It provides methods for catalog discovery, availability checks, reservation creation,
+ * and transaction management.
  */
 class ExperticketService {
   /**
@@ -68,6 +79,7 @@ class ExperticketService {
    *
    * @returns A promise that resolves to the languages response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * const languages = await service.getLanguages();
@@ -85,6 +97,7 @@ class ExperticketService {
    *
    * @returns A promise that resolves to the providers response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * const providers = await service.getProviders();
@@ -105,6 +118,7 @@ class ExperticketService {
    *
    * @returns A promise that resolves to the catalog response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * const catalog = await service.getCatalog();
@@ -127,6 +141,7 @@ class ExperticketService {
    * @param dates - Array of dates in YYYY-MM-DD format.
    * @returns A promise that resolves to the capacity information.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * const capacity = await service.checkCapacity(['p1', 'p2'], ['2024-01-01']);
@@ -150,6 +165,7 @@ class ExperticketService {
    * @param searchParams - The search criteria including product IDs and date range.
    * @returns A promise that resolves to the real-time price response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * const prices = await service.getRealTimePrices({
@@ -171,9 +187,10 @@ class ExperticketService {
   /**
    * Creates a temporary reservation for one or more products.
    *
-   * @param params - The reservation details.
+   * @param params - The reservation details including access time and products.
    * @returns A promise that resolves to the reservation details.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * const reservation = await service.createReservation({
@@ -195,6 +212,7 @@ class ExperticketService {
    * @param params - The parameters required to create the transaction.
    * @returns A promise that resolves to the API response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * await service.createTransaction({
@@ -218,6 +236,7 @@ class ExperticketService {
    * @param searchParams - Optional filters for the transaction list.
    * @returns A promise that resolves to the transactions response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * const transactions = await service.getTransactions({ PageSize: 10 });
@@ -239,6 +258,7 @@ class ExperticketService {
    * @param searchParams - Optional filters for the cancellation requests list.
    * @returns A promise that resolves to the cancellation requests response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * const requests = await service.getCancellationRequests({ Status: 0 });
@@ -260,6 +280,7 @@ class ExperticketService {
    * @param params - The cancellation details.
    * @returns A promise that resolves to the API response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * await service.submitCancellation({
@@ -283,6 +304,7 @@ class ExperticketService {
    * @param transactionId - The unique identifier of the transaction.
    * @returns A promise that resolves to the transaction documents response.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
+   *
    * @example
    * ```typescript
    * const docs = await service.getTransactionDocuments('sale123');
@@ -302,6 +324,9 @@ class ExperticketService {
   /**
    * Performs a POST request to the API.
    * @internal
+   * @param endpoint - The API endpoint.
+   * @param body - The request payload.
+   * @returns A promise that resolves to the typed API response.
    */
   private async post<T extends ApiResponse>(endpoint: string, body: object): Promise<T> {
     return this.request<T>({
@@ -320,6 +345,8 @@ class ExperticketService {
   /**
    * Executes a network request and handles common response logic.
    * @internal
+   * @param config - The request configuration.
+   * @returns A promise that resolves to the typed API response.
    */
   private async request<T extends ApiResponse>(config: RequestConfig): Promise<T> {
     try {
@@ -338,6 +365,9 @@ class ExperticketService {
   /**
    * Builds a full URL with query parameters.
    * @internal
+   * @param endpoint - The API endpoint.
+   * @param params - The query parameters.
+   * @returns The constructed URL object.
    */
   private buildUrl(endpoint: string, params: Record<string, string | number>): URL {
     const url = new URL(`https://${this.config.baseUrl}${endpoint}`);
@@ -350,6 +380,9 @@ class ExperticketService {
   /**
    * Wraps the native fetch API with standard headers.
    * @internal
+   * @param url - The target URL.
+   * @param options - The fetch options.
+   * @returns A promise that resolves to the fetch Response.
    */
   private async executeFetch(url: URL, options: RequestInit): Promise<Response> {
     const headers = {
@@ -363,6 +396,9 @@ class ExperticketService {
   /**
    * Parses the JSON response body.
    * @internal
+   * @param response - The fetch Response.
+   * @returns A promise that resolves to the parsed JSON data.
+   * @throws {@link ExperticketApiError} If parsing fails.
    */
   private async parseResponse<T>(response: Response): Promise<T> {
     try {
@@ -375,6 +411,9 @@ class ExperticketService {
   /**
    * Validates the API response for logical errors.
    * @internal
+   * @param data - The parsed API response.
+   * @param response - The fetch Response object.
+   * @throws {@link ExperticketApiError} If the API reports an error or the status is not OK.
    */
   private validateResponse(data: ApiResponse, response: Response): void {
     if (!response.ok || data.Success === false) {
@@ -388,6 +427,8 @@ class ExperticketService {
   /**
    * Normalizes any error into an ExperticketApiError.
    * @internal
+   * @param error - The error to normalize.
+   * @returns An instance of ExperticketApiError.
    */
   private handleError(error: unknown): ExperticketApiError {
     if (error instanceof ExperticketApiError) return error;

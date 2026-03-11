@@ -6,12 +6,24 @@ import ExperticketService from '../services/experticketService';
 /**
  * Fetches and filters sales transactions for the dashboard.
  *
+ * @remarks
+ * This hook provides access to the history of transactions for a partner.
+ * it includes built-in filtering by transaction ID or product name.
+ *
  * @param config - The Experticket API configuration.
  * @returns An object containing the transaction list, loading state, search functionality, and refresh function.
  *
  * @example
  * ```tsx
- * const { transactions, searchTerm, setSearchTerm, refresh } = useTransactions(config);
+ * function TransactionsView({ config }) {
+ *   const { transactions, searchTerm, setSearchTerm, loading } = useTransactions(config);
+ *   return (
+ *     <div>
+ *       <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+ *       {loading ? "..." : transactions.map(t => <div key={t.TransactionId}>{t.TransactionId}</div>)}
+ *     </div>
+ *   );
+ * }
  * ```
  */
 export const useTransactions = (config: ExperticketConfig) => {

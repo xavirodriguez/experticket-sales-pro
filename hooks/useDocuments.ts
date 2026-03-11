@@ -6,12 +6,31 @@ import ExperticketService from '../services/experticketService';
 /**
  * Retrieves and manages document links for a specific transaction.
  *
+ * @remarks
+ * This hook allows fetching downloadable documents (such as PDF tickets)
+ * associated with a completed Experticket transaction.
+ *
  * @param config - The Experticket API configuration.
  * @returns An object containing the document list, loading/error states, and a fetch function.
  *
  * @example
  * ```tsx
- * const { documents, fetchDocuments, loading } = useDocuments(config);
+ * function DocumentDownloader({ config, transactionId }) {
+ *   const { documents, fetchDocuments, loading } = useDocuments(config);
+ *
+ *   useEffect(() => {
+ *     fetchDocuments(transactionId);
+ *   }, [transactionId, fetchDocuments]);
+ *
+ *   if (loading) return <div>Loading documents...</div>;
+ *   return (
+ *     <ul>
+ *       {documents.map(doc => (
+ *         <li key={doc.SalesDocumentUrl}><a href={doc.SalesDocumentUrl}>Download</a></li>
+ *       ))}
+ *     </ul>
+ *   );
+ * }
  * ```
  */
 export const useDocuments = (config: ExperticketConfig) => {
@@ -23,7 +42,7 @@ export const useDocuments = (config: ExperticketConfig) => {
 
   /**
    * Fetches document links (e.g., tickets) for the given transaction identifier.
-   * @internal
+   *
    * @param transactionId - The unique identifier of the transaction.
    */
   const fetchDocuments = useCallback(async (transactionId: string) => {

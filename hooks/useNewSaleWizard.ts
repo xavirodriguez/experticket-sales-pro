@@ -6,6 +6,10 @@ import { useWizardData } from './useWizardData';
 import { useWizardActions } from './useWizardActions';
 import { useWizardNavigation } from './useWizardNavigation';
 
+/**
+ * Initial state for the sale wizard flow.
+ * @internal
+ */
 const INITIAL_STATE: SaleWizardState = {
   step: 1,
   selectedProviderId: '',
@@ -25,13 +29,24 @@ const INITIAL_STATE: SaleWizardState = {
  * reservation creation, and final transaction processing. It adheres to the 'No Null'
  * principle by using `undefined` for optional data.
  *
+ * It decomposes logic into several specialized sub-hooks ({@link useWizardData},
+ * {@link useWizardActions}, {@link useWizardNavigation}) to maintain single responsibility.
+ *
  * @param config - The Experticket API configuration.
  * @returns An object containing the current state, loading/error indicators,
  *          data lists, and navigation/update functions.
  *
  * @example
  * ```tsx
- * const { state, goToNextStep, updateState } = useNewSaleWizard(config);
+ * function NewSale() {
+ *   const { state, goToNextStep, updateState, loading } = useNewSaleWizard(config);
+ *   return (
+ *     <div>
+ *       <p>Step: {state.step}</p>
+ *       <button onClick={goToNextStep} disabled={loading}>Next</button>
+ *     </div>
+ *   );
+ * }
  * ```
  */
 export const useNewSaleWizard = (config: ExperticketConfig) => {
@@ -41,10 +56,19 @@ export const useNewSaleWizard = (config: ExperticketConfig) => {
 
   const experticketService = useMemo(() => new ExperticketService(config), [config]);
 
+  /**
+   * Updates specific fields of the wizard state.
+   * @param updates - Partial state updates.
+   */
   const updateState = useCallback((updates: Partial<SaleWizardState>) => {
     setState(prevState => ({ ...prevState, ...updates }));
   }, []);
 
+  /**
+   * Executes a wizard action with loading and error handling.
+   * @internal
+   * @param action - The async action to perform.
+   */
   const executeAction = useCallback(async (action: () => Promise<void>) => {
     setLoading(true);
     setError('');

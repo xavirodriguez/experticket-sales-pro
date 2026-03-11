@@ -12,6 +12,10 @@ export interface AssistantMessage {
   text: string;
 }
 
+/**
+ * Initial greeting from the AI assistant.
+ * @internal
+ */
 const INITIAL_MESSAGE: AssistantMessage = {
   role: 'bot',
   text: 'Hello! I am your Sales Assistant. How can I help you with Experticket bookings today?'
@@ -20,11 +24,26 @@ const INITIAL_MESSAGE: AssistantMessage = {
 /**
  * Manages the state and interactions with the AI sales assistant.
  *
+ * @remarks
+ * This hook maintains a history of messages and provides a function to send
+ * new user prompts to the AI service. It handles loading states and errors
+ * during communication.
+ *
  * @returns An object containing the message history, loading state, and a function to send messages.
  *
  * @example
  * ```tsx
- * const { messages, isLoading, sendMessage } = useAssistant();
+ * function MyComponent() {
+ *   const { messages, isLoading, sendMessage } = useAssistant();
+ *   return (
+ *     <div>
+ *       {messages.map((m, i) => <div key={i}>{m.text}</div>)}
+ *       <button onClick={() => sendMessage("Help!")} disabled={isLoading}>
+ *         Send
+ *       </button>
+ *     </div>
+ *   );
+ * }
  * ```
  */
 export const useAssistant = () => {
@@ -34,6 +53,8 @@ export const useAssistant = () => {
   /**
    * Appends a new message to the chat history.
    * @internal
+   * @param role - The sender's role.
+   * @param text - The message content.
    */
   const appendMessage = useCallback((role: 'user' | 'bot', text: string) => {
     setMessages(prev => [...prev, { role, text }]);

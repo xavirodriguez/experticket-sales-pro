@@ -11,7 +11,8 @@ import AssistantInput from './assistant/AssistantInput';
  *
  * @remarks
  * This component provides a chat interface for sales agents to get assistance
- * with ticketing terminology and platform processes.
+ * with ticketing terminology and platform processes. It utilizes the {@link useAssistant}
+ * hook to manage state and communication with the Gemini AI service.
  *
  * @example
  * ```tsx
