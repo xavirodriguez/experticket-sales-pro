@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { CancellationReason } from '../../types';
 import { Send, Loader2, AlertCircle } from 'lucide-react';
+import WizardErrorMessage from '../wizard/WizardErrorMessage';
 
 interface CancellationFormProps {
   onSubmit: (saleId: string, reason: number, comments: string) => Promise<void>;
@@ -12,23 +13,28 @@ const CancellationForm: React.FC<CancellationFormProps> = ({ onSubmit, isSubmitt
   const [saleId, setSaleId] = useState('');
   const [reason, setReason] = useState(1);
   const [comments, setComments] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!saleId) return;
 
+    setError(null);
     try {
       await onSubmit(saleId, reason, comments);
       setSaleId('');
       setComments('');
-    } catch (err) {
-      alert('Error submitting cancellation: ' + err);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     }
   };
 
   return (
     <div className="lg:col-span-1 space-y-6">
       <h2 className="text-2xl font-bold">New Request</h2>
+
+      {error && <WizardErrorMessage message={error} />}
+
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
         <div className="space-y-1.5">
           <label className="text-sm font-bold text-gray-700">Sale Identifier</label>

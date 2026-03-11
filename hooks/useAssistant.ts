@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { AiService } from '../services/aiService';
 
 /**
@@ -61,7 +61,23 @@ export const useAssistant = () => {
   }, []);
 
   /**
-   * Sends a user prompt to the AI service and updates the chat history with the response.
+   * Processes the AI response and updates the state.
+   * @internal
+   */
+  const processAiResponse = useCallback(async (prompt: string) => {
+    try {
+      const response = await AiService.fetchResponse(prompt);
+      appendMessage('bot', response || "I'm sorry, I couldn't generate a response.");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Error connecting to AI service.";
+      appendMessage('bot', message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [appendMessage]);
+
+  /**
+   * Sends a user prompt to the AI service and updates the chat history.
    *
    * @param userPrompt - The message text from the user.
    */
@@ -70,17 +86,8 @@ export const useAssistant = () => {
 
     appendMessage('user', userPrompt);
     setIsLoading(true);
-
-    try {
-      const aiResponse = await AiService.fetchResponse(userPrompt);
-      appendMessage('bot', aiResponse || "I'm sorry, I couldn't generate a response.");
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Error connecting to AI service.";
-      appendMessage('bot', errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [appendMessage]);
+    await processAiResponse(userPrompt);
+  }, [appendMessage, processAiResponse]);
 
   return { messages, isLoading, sendMessage };
 };
