@@ -2,6 +2,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import DashboardMetrics from './dashboard/DashboardMetrics';
+import { ExperticketConfig } from '../types';
+
+/**
+ * Props for the {@link DashboardView} component.
+ */
+interface DashboardViewProps {
+  /** The Experticket API configuration. */
+  config: ExperticketConfig;
+}
 
 /**
  * The main dashboard view providing a high-level overview of sales activities.
@@ -10,16 +19,18 @@ import DashboardMetrics from './dashboard/DashboardMetrics';
  * This view displays key performance metrics and a call to action to start a new sale.
  * It is typically the entry point for sales agents.
  *
+ * @param props - Component props.
+ *
  * @example
  * ```tsx
  * <main>
- *   <DashboardView />
+ *   <DashboardView config={config} />
  * </main>
  * ```
  */
-const DashboardView: React.FC = () => (
+const DashboardView: React.FC<DashboardViewProps> = ({ config }) => (
   <div className="space-y-6">
-    <DashboardMetrics />
+    <DashboardMetrics config={config} />
 
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
       <div className="max-w-xl">

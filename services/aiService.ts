@@ -6,6 +6,16 @@
 const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Experticket platform. You help agents understand ticketing terminology, provider rules, and the sales flow (Capacity -> Price -> Reservation -> Transaction). Keep answers professional, concise, and helpful.";
 
 /**
+ * Represents a single message in the Gemini AI conversation.
+ */
+export interface GeminiMessage {
+  /** The role of the message sender. */
+  role: 'user' | 'model';
+  /** The content parts of the message. */
+  parts: { text: string }[];
+}
+
+/**
  * Interacts with the AI model for sales assistance via REST API.
  *
  * @remarks
@@ -13,22 +23,23 @@ const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Ex
  * related to the Experticket platform and its sales processes.
  * It uses the Gemini REST API directly to avoid external SDK dependencies.
  */
-export class AiService {
+export const AiService = {
   /**
-   * Fetches a response from the AI model based on the user's prompt.
+   * Fetches a response from the AI model based on the conversation history.
    *
-   * @param userPrompt - The question or message from the sales agent.
+   * @param history - The full conversation history.
    * @returns A promise that resolves to the text response from the AI.
    * @throws Error If the AI API key is not configured or the AI service request fails.
    *
    * @example
    * ```typescript
-   * const response = await AiService.fetchResponse("What is a reservation expiry?");
-   * console.log(response); // "A reservation expiry is the amount of time in minutes..."
+   * const history = [{ role: 'user', parts: [{ text: "What is a reservation expiry?" }] }];
+   * const response = await AiService.fetchResponse(history);
+   * console.log(response);
    * ```
    */
-  static async fetchResponse(userPrompt: string): Promise<string> {
-    const apiKey = this.getApiKey();
+  async fetchResponse(history: GeminiMessage[]): Promise<string> {
+    const apiKey = getApiKey();
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
@@ -37,9 +48,7 @@ export class AiService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: userPrompt }]
-        }],
+        contents: history,
         system_instruction: {
           parts: [{ text: SYSTEM_INSTRUCTION }]
         }
@@ -52,47 +61,47 @@ export class AiService {
     }
 
     const data = await response.json();
-    return this.extractTextFromResponse(data);
+    return extractTextFromResponse(data);
   }
+};
 
-  /**
-   * Extracts the text content from the Gemini API response.
-   * @internal
-   * @param data - The parsed JSON response from the API.
-   * @returns The extracted text content.
-   * @throws Error if the response format is invalid.
-   */
-  private static extractTextFromResponse(data: unknown): string {
-    const response = data as {
-      candidates?: {
-        content?: {
-          parts?: { text?: string }[];
-        };
-      }[];
-    };
+/**
+ * Extracts the text content from the Gemini API response.
+ * @internal
+ * @param data - The parsed JSON response from the API.
+ * @returns The extracted text content.
+ * @throws Error if the response format is invalid.
+ */
+function extractTextFromResponse(data: unknown): string {
+  const response = data as {
+    candidates?: {
+      content?: {
+        parts?: { text?: string }[];
+      };
+    }[];
+  };
 
-    const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) {
-      throw new Error("Invalid response format from AI service");
-    }
-    return text;
+  const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new Error("Invalid response format from AI service");
   }
+  return text;
+}
 
-  /**
-   * Retrieves the AI API key from environment variables.
-   * @internal
-   * @returns The configured API key.
-   * @throws Error if no API key is found in the environment.
-   */
-  private static getApiKey(): string {
-    const metaEnv = (import.meta as any).env;
-    const apiKey = metaEnv?.VITE_AI_API_KEY ||
-                   process.env?.AI_API_KEY ||
-                   process.env?.API_KEY;
+/**
+ * Retrieves the AI API key from environment variables.
+ * @internal
+ * @returns The configured API key.
+ * @throws Error if no API key is found in the environment.
+ */
+function getApiKey(): string {
+  const metaEnv = (import.meta as unknown as { env: Record<string, string> }).env;
+  const apiKey = metaEnv?.VITE_AI_API_KEY ||
+                 (process.env as Record<string, string | undefined>)?.AI_API_KEY ||
+                 (process.env as Record<string, string | undefined>)?.API_KEY;
 
-    if (!apiKey) {
-      throw new Error("AI API Key is not configured in environment variables");
-    }
-    return apiKey;
+  if (!apiKey) {
+    throw new Error("AI API Key is not configured in environment variables");
   }
+  return apiKey;
 }
