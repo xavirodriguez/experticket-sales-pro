@@ -42,7 +42,9 @@ const WizardProgressBar: React.FC<WizardProgressBarProps> = ({ currentStep }) =>
                 </span>
               </div>
               {idx < steps.length - 1 && (
-                <div className="flex-1 h-0.5 bg-gray-200 mx-4 -mt-6" />
+                <div className={`flex-1 h-0.5 mx-4 -mt-6 transition-colors duration-500 ${
+                  currentStep > step.id ? 'bg-green-400' : 'bg-gray-200'
+                }`} />
               )}
             </React.Fragment>
           );

@@ -10,7 +10,12 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
-      <button onClick={onMenuClick} className="lg:hidden text-gray-500 p-2 -ml-2">
+      <button
+        type="button"
+        aria-label="Toggle navigation menu"
+        onClick={onMenuClick}
+        className="lg:hidden text-gray-500 p-2 -ml-2"
+      >
         <Menu size={24} />
       </button>
       <div className="flex-1 lg:ml-0 ml-4">

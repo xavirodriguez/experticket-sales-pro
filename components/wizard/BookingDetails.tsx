@@ -28,8 +28,11 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
         type="number"
         min="1"
         className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-        value={quantity}
-        onChange={(e) => onUpdate({ quantity: parseInt(e.target.value) || 1 })}
+        value={quantity || ''}
+        onChange={(e) => {
+          const val = parseInt(e.target.value);
+          onUpdate({ quantity: isNaN(val) ? 0 : Math.max(0, val) });
+        }}
       />
     </div>
   </div>

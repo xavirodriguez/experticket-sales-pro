@@ -21,6 +21,8 @@ const AssistantInput: React.FC<AssistantInputProps> = ({ prompt, setPrompt, onSe
         onKeyDown={(e) => e.key === 'Enter' && onSend()}
       />
       <button
+        type="button"
+        aria-label="Send message"
         onClick={onSend}
         disabled={isLoading || !prompt.trim()}
         className="p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition"

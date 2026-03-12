@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Search, RefreshCw } from 'lucide-react';
 
 interface TransactionFiltersProps {
   searchTerm: string;
@@ -28,10 +28,12 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
           />
         </div>
         <button
+          type="button"
+          aria-label="Refresh transactions"
           onClick={onRefresh}
           className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition"
         >
-          <Filter size={20} />
+          <RefreshCw size={20} />
         </button>
       </div>
     </div>

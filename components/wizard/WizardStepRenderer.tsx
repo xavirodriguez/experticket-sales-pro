@@ -69,6 +69,7 @@ const WizardStepRenderer: React.FC<WizardStepRendererProps> = ({
       <SaleConfirmationStep
         onNewBooking={resetWizard}
         onViewTransactions={onViewTransactions}
+        transactionId={state.transactionId}
       />
     )
   };

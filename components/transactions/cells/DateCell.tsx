@@ -11,10 +11,15 @@ interface DateCellProps {
  * @param props - Component props.
  * @internal
  */
-const DateCell: React.FC<DateCellProps> = ({ date }) => (
-  <td className="px-6 py-4 text-sm font-medium text-gray-600">
-    {new Date(date).toLocaleDateString()}
-  </td>
-);
+const DateCell: React.FC<DateCellProps> = ({ date }) => {
+  const d = new Date(date);
+  const isValid = !isNaN(d.getTime());
+
+  return (
+    <td className="px-6 py-4 text-sm font-medium text-gray-600">
+      {isValid ? d.toLocaleDateString() : '—'}
+    </td>
+  );
+};
 
 export default DateCell;

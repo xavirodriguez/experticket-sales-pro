@@ -40,7 +40,7 @@ const CancellationForm: React.FC<CancellationFormProps> = ({ onSubmit, isSubmitt
           <label className="text-sm font-bold text-gray-700">Sale Identifier</label>
           <input
             type="text"
-            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 transition"
+            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition"
             placeholder="e.g. SL-98234..."
             value={saleId}
             onChange={(e) => setSaleId(e.target.value)}
@@ -51,7 +51,7 @@ const CancellationForm: React.FC<CancellationFormProps> = ({ onSubmit, isSubmitt
         <div className="space-y-1.5">
           <label className="text-sm font-bold text-gray-700">Reason for Cancellation</label>
           <select
-            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 transition"
+            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition"
             value={reason}
             onChange={(e) => setReason(parseInt(e.target.value))}
           >
@@ -67,7 +67,7 @@ const CancellationForm: React.FC<CancellationFormProps> = ({ onSubmit, isSubmitt
         <div className="space-y-1.5">
           <label className="text-sm font-bold text-gray-700">Comments (Optional)</label>
           <textarea
-            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 transition h-24"
+            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition h-24"
             value={comments}
             onChange={(e) => setComments(e.target.value)}
           />

@@ -57,12 +57,19 @@ export const useWizardActions = ({ experticketService, state, updateState }: Wiz
 
   /** Finalizes the transaction from the existing reservation. */
   const handleTransaction = useCallback(async () => {
-    await experticketService.createTransaction({
+    const response = await experticketService.createTransaction({
       reservationId: state.reservationId,
       accessDate: state.accessDate,
       products: [{ ProductId: state.selectedProductId }]
     });
-    updateState({ step: 4 });
+
+    // ApiResponse might have TransactionId if it's a specific implementation
+    const transactionId = response.TransactionId || state.reservationId;
+
+    updateState({
+      step: 4,
+      transactionId
+    });
   }, [experticketService, state.reservationId, state.accessDate, state.selectedProductId, updateState]);
 
   return { capacityInfo, handleProductSelection, handleReservation, handleTransaction };
