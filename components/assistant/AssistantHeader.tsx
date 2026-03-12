@@ -12,7 +12,12 @@ const AssistantHeader: React.FC<AssistantHeaderProps> = ({ onClose }) => (
       <Bot size={20} />
       <span className="font-bold">Experticket Assistant</span>
     </div>
-    <button onClick={onClose} className="hover:bg-white/20 p-1 rounded-lg">
+    <button
+      type="button"
+      aria-label="Close assistant"
+      onClick={onClose}
+      className="hover:bg-white/20 p-1 rounded-lg"
+    >
       <X size={20} />
     </button>
   </div>

@@ -43,7 +43,10 @@ const CancellationRequestItem: React.FC<CancellationRequestItemProps> = ({ reque
       <h4 className="font-bold text-gray-900">Sale Reference: {request.SaleId}</h4>
       <p className="text-sm text-gray-500 mt-1">{request.StatusComments || 'No comments from provider yet.'}</p>
       <div className="mt-4 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-        Created: {new Date(request.CreatedDateTime).toLocaleString()}
+        Created: {(() => {
+          const d = new Date(request.CreatedDateTime);
+          return !isNaN(d.getTime()) ? d.toLocaleString() : 'N/A';
+        })()}
       </div>
     </div>
   );

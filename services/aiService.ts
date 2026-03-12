@@ -85,7 +85,8 @@ export class AiService {
    * @throws Error if no API key is found in the environment.
    */
   private static getApiKey(): string {
-    const apiKey = (import.meta as ImportMeta).env?.VITE_AI_API_KEY ||
+    const metaEnv = (import.meta as any).env;
+    const apiKey = metaEnv?.VITE_AI_API_KEY ||
                    process.env?.AI_API_KEY ||
                    process.env?.API_KEY;
 

@@ -16,6 +16,49 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(229, 231, 235, 0.5);
         }
+
+        /* Fallback for tailwindcss-animate plugin not available in CDN */
+        .animate-in {
+            animation-duration: 200ms;
+            animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            animation-fill-mode: both;
+        }
+
+        .fade-in {
+            animation-name: fade-in;
+        }
+
+        .zoom-in-95 {
+            animation-name: zoom-in-95;
+        }
+
+        .slide-in-from-bottom-2 {
+            animation-name: slide-in-from-bottom-2;
+        }
+
+        .slide-in-from-bottom-4 {
+            animation-name: slide-in-from-bottom-4;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoom-in-95 {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slide-in-from-bottom-2 {
+            from { transform: translateY(0.5rem); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slide-in-from-bottom-4 {
+            from { transform: translateY(1rem); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 <script type="importmap">
 {

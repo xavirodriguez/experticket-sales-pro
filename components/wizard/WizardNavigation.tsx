@@ -18,6 +18,7 @@ const WizardNavigation: React.FC<WizardNavigationProps> = ({
   return (
     <div className="p-6 border-t border-gray-100 flex justify-between items-center bg-gray-50/30">
       <button
+        type="button"
         disabled={step === 1 || loading}
         onClick={onBack}
         className="flex items-center space-x-2 px-6 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-white disabled:opacity-30 transition font-bold"
@@ -27,6 +28,7 @@ const WizardNavigation: React.FC<WizardNavigationProps> = ({
       </button>
 
       <button
+        type="button"
         disabled={loading}
         onClick={onNext}
         className="flex items-center space-x-2 px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 font-bold"

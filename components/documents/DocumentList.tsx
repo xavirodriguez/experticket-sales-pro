@@ -22,7 +22,8 @@ const DocumentItem: React.FC<{ doc: TransactionDocument }> = ({ doc }) => (
     <a
       href={doc.SalesDocumentUrl}
       target="_blank"
-      rel="noreferrer"
+      rel="noopener noreferrer"
+      aria-label={`Open voucher in ${doc.LanguageCode}`}
       className="p-3 bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition"
     >
       <ExternalLink size={20} />
@@ -34,8 +35,8 @@ const DocumentList: React.FC<DocumentListProps> = ({ documents, hasSearched }) =
   if (documents.length > 0) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4">
-        {documents.map((doc, idx) => (
-          <DocumentItem key={idx} doc={doc} />
+        {documents.map((doc) => (
+          <DocumentItem key={`${doc.LanguageCode}-${doc.SalesDocumentUrl}`} doc={doc} />
         ))}
       </div>
     );

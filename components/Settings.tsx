@@ -53,6 +53,7 @@ const Settings: React.FC<SettingsProps> = ({ config, onUpdate }) => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">API Configuration</h2>
         <button
+          type="button"
           onClick={handleSave}
           disabled={status === 'saving'}
           className={`flex items-center space-x-2 px-6 py-2.5 rounded-xl font-bold transition shadow-lg ${
@@ -135,6 +136,8 @@ const Settings: React.FC<SettingsProps> = ({ config, onUpdate }) => {
                 </div>
               </div>
               <button
+                type="button"
+                aria-label="Toggle Sandbox Mode"
                 onClick={() => setLocalConfig({ ...localConfig, isTest: !localConfig.isTest })}
                 className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 ${localConfig.isTest ? 'bg-orange-500' : 'bg-gray-300'}`}
               >

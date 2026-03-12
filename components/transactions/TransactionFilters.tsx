@@ -28,6 +28,8 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
           />
         </div>
         <button
+          type="button"
+          aria-label="Refresh transactions"
           onClick={onRefresh}
           className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition"
         >

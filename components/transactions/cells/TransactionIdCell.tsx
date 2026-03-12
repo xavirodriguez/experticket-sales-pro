@@ -12,11 +12,18 @@ interface TransactionIdCellProps {
  * @param props - Component props.
  * @internal
  */
-const TransactionIdCell: React.FC<TransactionIdCellProps> = ({ id, timestamp }) => (
-  <td className="px-6 py-4">
-    <p className="text-sm font-bold text-blue-600 truncate max-w-[120px]">{id}</p>
-    <p className="text-[10px] text-gray-400 font-medium">{new Date(timestamp).toLocaleString()}</p>
-  </td>
-);
+const TransactionIdCell: React.FC<TransactionIdCellProps> = ({ id, timestamp }) => {
+  const d = new Date(timestamp);
+  const isValid = !isNaN(d.getTime());
+
+  return (
+    <td className="px-6 py-4">
+      <p className="text-sm font-bold text-blue-600 truncate max-w-[120px]" title={id}>{id}</p>
+      <p className="text-[10px] text-gray-400 font-medium">
+        {isValid ? d.toLocaleString() : '—'}
+      </p>
+    </td>
+  );
+};
 
 export default TransactionIdCell;

@@ -22,12 +22,14 @@ const SaleConfirmationStep: React.FC<SaleConfirmationStepProps> = ({
       </p>
       <div className="mt-8 flex justify-center space-x-4">
         <button
+          type="button"
           onClick={onViewTransactions}
           className="px-6 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 font-bold transition"
         >
           View Transaction
         </button>
         <button
+          type="button"
           onClick={onNewBooking}
           className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold transition shadow-lg shadow-blue-100"
         >

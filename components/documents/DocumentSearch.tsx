@@ -28,6 +28,7 @@ const DocumentSearch: React.FC<DocumentSearchProps> = ({ onSearch, loading }) =>
         />
       </div>
       <button
+        type="button"
         onClick={handleSubmit}
         disabled={loading || !id}
         className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50"
