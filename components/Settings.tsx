@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { ExperticketConfig } from '../types';
-import { Save, ShieldCheck, AlertCircle, Globe, Key, Building2 } from 'lucide-react';
+import { Save, ShieldCheck, AlertCircle, Globe, Eye, EyeOff, Building2 } from 'lucide-react';
 
 /**
  * Props for the {@link Settings} component.
@@ -34,6 +34,7 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ config, onUpdate }) => {
   const [localConfig, setLocalConfig] = useState(config);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [showApiKey, setShowApiKey] = useState(false);
 
   /**
    * Persists the local configuration changes.
@@ -98,13 +99,20 @@ const Settings: React.FC<SettingsProps> = ({ config, onUpdate }) => {
               <label className="text-sm font-bold text-gray-600">API Secret Key</label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showApiKey ? "text" : "password"}
                   className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition pr-10"
                   value={localConfig.apiKey}
                   onChange={(e) => setLocalConfig({ ...localConfig, apiKey: e.target.value })}
                   placeholder="Paste your API key here"
                 />
-                <Key className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey(prev => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                  aria-label={showApiKey ? "Hide API key" : "Show API key"}
+                >
+                  {showApiKey ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
           </div>

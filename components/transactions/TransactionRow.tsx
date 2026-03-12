@@ -36,7 +36,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({ transaction }) => {
         providerName={firstProduct?.ProviderName || ''}
       />
       <AmountCell amount={amount} />
-      <StatusCell />
+      <StatusCell success={transaction.Success} />
       <ActionCell />
     </tr>
   );

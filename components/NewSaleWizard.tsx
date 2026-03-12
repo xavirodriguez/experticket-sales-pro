@@ -46,6 +46,9 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
     updateState
   } = useNewSaleWizard(config);
 
+  const isCapacityBlocked = state.step === 2 &&
+    capacityInfo?.Products?.[0]?.AvailableCapacity === 0;
+
   const handleViewTransactions = useCallback(() => {
     window.location.hash = '/transactions';
   }, []);
@@ -75,6 +78,7 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
           loading={loading}
           onNext={goToNextStep}
           onBack={goToPreviousStep}
+          isCapacityBlocked={isCapacityBlocked}
         />
       )}
     </div>

@@ -38,6 +38,8 @@ export interface ApiResponse {
   ErrorMessage?: string;
   /** Numeric error code representing the specific failure reason. */
   ErrorCode?: number;
+  /** Optional transaction identifier returned by some operations. */
+  TransactionId?: string;
 }
 
 /**

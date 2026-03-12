@@ -7,13 +7,15 @@ interface WizardNavigationProps {
   loading: boolean;
   onNext: () => void;
   onBack: () => void;
+  isCapacityBlocked?: boolean;
 }
 
 const WizardNavigation: React.FC<WizardNavigationProps> = ({
   step,
   loading,
   onNext,
-  onBack
+  onBack,
+  isCapacityBlocked = false
 }) => {
   return (
     <div className="p-6 border-t border-gray-100 flex justify-between items-center bg-gray-50/30">
@@ -29,9 +31,9 @@ const WizardNavigation: React.FC<WizardNavigationProps> = ({
 
       <button
         type="button"
-        disabled={loading}
+        disabled={loading || isCapacityBlocked}
         onClick={onNext}
-        className="flex items-center space-x-2 px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 font-bold"
+        className="flex items-center space-x-2 px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 font-bold disabled:opacity-50"
       >
         {loading ? <Loader2 className="animate-spin" size={20} /> : (
           <>
