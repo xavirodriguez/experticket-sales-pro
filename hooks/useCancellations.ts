@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { ExperticketConfig, CancellationRequest } from '../types';
+import { ExperticketConfig, CancellationRequest, CancellationSubmissionParams } from '../types';
 import ExperticketService from '../services/experticketService';
 
 /**
@@ -51,15 +51,13 @@ export const useCancellations = (config: ExperticketConfig) => {
   /**
    * Submits a new cancellation request for a specific sale.
    *
-   * @param saleId - The identifier of the sale to cancel.
-   * @param reason - The numeric reason code for cancellation (e.g., from {@link CancellationReason}).
-   * @param comments - Optional explanatory comments from the agent.
+   * @param params - The cancellation details.
    * @throws Error if the cancellation submission fails.
    */
-  const submitCancellation = useCallback(async (saleId: string, reason: number, comments: string) => {
+  const submitCancellation = useCallback(async (params: CancellationSubmissionParams) => {
     try {
       setIsSubmitting(true);
-      await experticketService.submitCancellation({ saleId, reason, comments });
+      await experticketService.submitCancellation(params);
       await fetchRequests();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Cancellation submission failed';

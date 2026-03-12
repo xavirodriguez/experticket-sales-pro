@@ -1,4 +1,3 @@
-
 /**
  * System instruction to guide the AI assistant's persona and behavior.
  * @internal
@@ -29,26 +28,51 @@ export class AiService {
    */
   static async fetchResponse(userPrompt: string): Promise<string> {
     const apiKey = this.getApiKey();
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = this.buildApiUrl(apiKey);
+    const payload = this.createPayload(userPrompt);
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: userPrompt }]
-        }],
-        system_instruction: {
-          parts: [{ text: SYSTEM_INSTRUCTION }]
-        }
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
+    return this.handleApiResponse(response);
+  }
+
+  /**
+   * Builds the API URL for the Gemini model.
+   * @internal
+   * @param apiKey - The AI API key.
+   */
+  private static buildApiUrl(apiKey: string): string {
+    const baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
+    return `${baseUrl}/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  }
+
+  /**
+   * Creates the request payload for the AI service.
+   * @internal
+   * @param userPrompt - The user's message.
+   */
+  private static createPayload(userPrompt: string): object {
+    return {
+      contents: [{ parts: [{ text: userPrompt }] }],
+      system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] }
+    };
+  }
+
+  /**
+   * Handles the response from the AI service.
+   * @internal
+   * @param response - The fetch Response object.
+   * @throws Error if the response is not OK.
+   */
+  private static async handleApiResponse(response: Response): Promise<string> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `AI service request failed with status ${response.status}`);
+      const message = errorData.error?.message || `Status ${response.status}`;
+      throw new Error(`AI service request failed with ${message}`);
     }
 
     const data = await response.json();

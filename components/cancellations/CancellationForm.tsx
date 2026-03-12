@@ -1,27 +1,38 @@
 
 import React, { useState } from 'react';
-import { CancellationReason } from '../../types';
+import { CancellationReason, CancellationSubmissionParams } from '../../types';
 import { Send, Loader2, AlertCircle } from 'lucide-react';
 import WizardErrorMessage from '../wizard/WizardErrorMessage';
 
+/**
+ * Props for the {@link CancellationForm} component.
+ */
 interface CancellationFormProps {
-  onSubmit: (saleId: string, reason: number, comments: string) => Promise<void>;
+  /** Callback to submit the cancellation request. */
+  onSubmit: (params: CancellationSubmissionParams) => Promise<void>;
+  /** Whether the request is currently being submitted. */
   isSubmitting: boolean;
 }
 
+/**
+ * A form for agents to submit new cancellation requests.
+ *
+ * @param props - Component props.
+ * @internal
+ */
 const CancellationForm: React.FC<CancellationFormProps> = ({ onSubmit, isSubmitting }) => {
   const [saleId, setSaleId] = useState('');
   const [reason, setReason] = useState(1);
   const [comments, setComments] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!saleId) return;
 
-    setError(null);
+    setError(undefined);
     try {
-      await onSubmit(saleId, reason, comments);
+      await onSubmit({ saleId, reason, comments });
       setSaleId('');
       setComments('');
     } catch (err: unknown) {
