@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Provider, CatalogResponse } from '../types';
 import ExperticketService from '../services/experticketService';
 

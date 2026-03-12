@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { AiService } from '../services/aiService';
 
 /**

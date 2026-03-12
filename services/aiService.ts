@@ -1,9 +1,89 @@
-
 /**
  * System instruction to guide the AI assistant's persona and behavior.
  * @internal
  */
 const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Experticket platform. You help agents understand ticketing terminology, provider rules, and the sales flow (Capacity -> Price -> Reservation -> Transaction). Keep answers professional, concise, and helpful.";
+
+/**
+ * Retrieves the AI API key from environment variables.
+ * @internal
+ * @returns The configured API key.
+ * @throws Error if no API key is found in the environment.
+ */
+const getApiKey = (): string => {
+  const metaEnv = (import.meta as unknown as { env: Record<string, string> }).env;
+  const apiKey = metaEnv?.VITE_AI_API_KEY ||
+                 process.env?.AI_API_KEY ||
+                 process.env?.API_KEY;
+
+  if (!apiKey) {
+    throw new Error("AI API Key is not configured in environment variables");
+  }
+  return apiKey;
+};
+
+/**
+ * Builds the API URL for the Gemini service.
+ * @internal
+ * @param apiKey - The API key to include in the URL.
+ * @returns The complete API endpoint URL.
+ */
+const buildApiUrl = (apiKey: string): string =>
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+/**
+ * Creates the request payload for the Gemini API.
+ * @internal
+ * @param userPrompt - The message from the user.
+ * @returns The JSON-serializable payload object.
+ */
+const createPayload = (userPrompt: string) => ({
+  contents: [{
+    parts: [{ text: userPrompt }]
+  }],
+  system_instruction: {
+    parts: [{ text: SYSTEM_INSTRUCTION }]
+  }
+});
+
+/**
+ * Extracts the text content from the Gemini API response.
+ * @internal
+ * @param data - The parsed JSON response from the API.
+ * @returns The extracted text content.
+ * @throws Error if the response format is invalid.
+ */
+const extractTextFromResponse = (data: unknown): string => {
+  const response = data as {
+    candidates?: {
+      content?: {
+        parts?: { text?: string }[];
+      };
+    }[];
+  };
+
+  const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new Error("Invalid response format from AI service");
+  }
+  return text;
+};
+
+/**
+ * Handles the raw API response and extracts the data.
+ * @internal
+ * @param response - The Fetch API Response object.
+ * @returns A promise that resolves to the response text.
+ */
+const handleApiResponse = async (response: Response): Promise<string> => {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || `AI service request failed with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  return extractTextFromResponse(data);
+};
 
 /**
  * Interacts with the AI model for sales assistance via REST API.
@@ -13,7 +93,7 @@ const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Ex
  * related to the Experticket platform and its sales processes.
  * It uses the Gemini REST API directly to avoid external SDK dependencies.
  */
-export class AiService {
+export const AiService = {
   /**
    * Fetches a response from the AI model based on the user's prompt.
    *
@@ -27,72 +107,18 @@ export class AiService {
    * console.log(response); // "A reservation expiry is the amount of time in minutes..."
    * ```
    */
-  static async fetchResponse(userPrompt: string): Promise<string> {
-    const apiKey = this.getApiKey();
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  fetchResponse: async (userPrompt: string): Promise<string> => {
+    const apiKey = getApiKey();
+    const url = buildApiUrl(apiKey);
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: userPrompt }]
-        }],
-        system_instruction: {
-          parts: [{ text: SYSTEM_INSTRUCTION }]
-        }
-      })
+      body: JSON.stringify(createPayload(userPrompt))
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `AI service request failed with status ${response.status}`);
-    }
-
-    const data = await response.json();
-    return this.extractTextFromResponse(data);
+    return handleApiResponse(response);
   }
-
-  /**
-   * Extracts the text content from the Gemini API response.
-   * @internal
-   * @param data - The parsed JSON response from the API.
-   * @returns The extracted text content.
-   * @throws Error if the response format is invalid.
-   */
-  private static extractTextFromResponse(data: unknown): string {
-    const response = data as {
-      candidates?: {
-        content?: {
-          parts?: { text?: string }[];
-        };
-      }[];
-    };
-
-    const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) {
-      throw new Error("Invalid response format from AI service");
-    }
-    return text;
-  }
-
-  /**
-   * Retrieves the AI API key from environment variables.
-   * @internal
-   * @returns The configured API key.
-   * @throws Error if no API key is found in the environment.
-   */
-  private static getApiKey(): string {
-    const metaEnv = (import.meta as any).env;
-    const apiKey = metaEnv?.VITE_AI_API_KEY ||
-                   process.env?.AI_API_KEY ||
-                   process.env?.API_KEY;
-
-    if (!apiKey) {
-      throw new Error("AI API Key is not configured in environment variables");
-    }
-    return apiKey;
-  }
-}
+};
