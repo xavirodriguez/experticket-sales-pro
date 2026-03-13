@@ -5,6 +5,16 @@
 const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Experticket platform. You help agents understand ticketing terminology, provider rules, and the sales flow (Capacity -> Price -> Reservation -> Transaction). Keep answers professional, concise, and helpful.";
 
 /**
+ * Represents a single message in the Gemini AI conversation.
+ */
+export interface GeminiMessage {
+  /** The role of the message sender. */
+  role: 'user' | 'model';
+  /** The content parts of the message. */
+  parts: { text: string }[];
+}
+
+/**
  * Retrieves the AI API key from environment variables.
  * @internal
  * @returns The configured API key.
@@ -13,8 +23,8 @@ const SYSTEM_INSTRUCTION = "You are an expert sales support assistant for the Ex
 const getApiKey = (): string => {
   const metaEnv = (import.meta as unknown as { env: Record<string, string> }).env;
   const apiKey = metaEnv?.VITE_AI_API_KEY ||
-                 process.env?.AI_API_KEY ||
-                 process.env?.API_KEY;
+                 (process.env as Record<string, string | undefined>)?.AI_API_KEY ||
+                 (process.env as Record<string, string | undefined>)?.API_KEY;
 
   if (!apiKey) {
     throw new Error("AI API Key is not configured in environment variables");
@@ -34,13 +44,11 @@ const buildApiUrl = (apiKey: string): string =>
 /**
  * Creates the request payload for the Gemini API.
  * @internal
- * @param userPrompt - The message from the user.
+ * @param history - The conversation history.
  * @returns The JSON-serializable payload object.
  */
-const createPayload = (userPrompt: string) => ({
-  contents: [{
-    parts: [{ text: userPrompt }]
-  }],
+const createPayload = (history: GeminiMessage[]) => ({
+  contents: history,
   system_instruction: {
     parts: [{ text: SYSTEM_INSTRUCTION }]
   }
@@ -95,19 +103,20 @@ const handleApiResponse = async (response: Response): Promise<string> => {
  */
 export const AiService = {
   /**
-   * Fetches a response from the AI model based on the user's prompt.
+   * Fetches a response from the AI model based on the conversation history.
    *
-   * @param userPrompt - The question or message from the sales agent.
+   * @param history - The full conversation history.
    * @returns A promise that resolves to the text response from the AI.
    * @throws Error If the AI API key is not configured or the AI service request fails.
    *
    * @example
    * ```typescript
-   * const response = await AiService.fetchResponse("What is a reservation expiry?");
-   * console.log(response); // "A reservation expiry is the amount of time in minutes..."
+   * const history = [{ role: 'user', parts: [{ text: "What is a reservation expiry?" }] }];
+   * const response = await AiService.fetchResponse(history);
+   * console.log(response);
    * ```
    */
-  fetchResponse: async (userPrompt: string): Promise<string> => {
+  fetchResponse: async (history: GeminiMessage[]): Promise<string> => {
     const apiKey = getApiKey();
     const url = buildApiUrl(apiKey);
 
@@ -116,7 +125,7 @@ export const AiService = {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(createPayload(userPrompt))
+      body: JSON.stringify(createPayload(history))
     });
 
     return handleApiResponse(response);

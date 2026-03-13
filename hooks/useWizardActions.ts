@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { SaleWizardState, CapacityResponse } from '../types';
 import ExperticketService from '../services/experticketService';

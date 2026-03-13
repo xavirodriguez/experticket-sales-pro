@@ -1,6 +1,5 @@
-
 import { useState, useCallback } from 'react';
-import { AiService } from '../services/aiService';
+import { AiService, GeminiMessage } from '../services/aiService';
 
 /**
  * Represents a single message in the assistant chat history.
@@ -48,33 +47,30 @@ const INITIAL_MESSAGE: AssistantMessage = {
  */
 export const useAssistant = () => {
   const [messages, setMessages] = useState<AssistantMessage[]>([INITIAL_MESSAGE]);
+  const [conversationHistory, setConversationHistory] = useState<GeminiMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  /**
-   * Appends a new message to the chat history.
-   * @internal
-   * @param role - The sender's role.
-   * @param text - The message content.
-   */
-  const appendMessage = useCallback((role: 'user' | 'bot', text: string) => {
-    setMessages(prev => [...prev, { role, text }]);
-  }, []);
 
   /**
    * Processes the AI response and updates the state.
    * @internal
    */
-  const processAiResponse = useCallback(async (prompt: string) => {
+  const processAiResponse = useCallback(async (currentHistory: GeminiMessage[]) => {
     try {
-      const response = await AiService.fetchResponse(prompt);
-      appendMessage('bot', response || "I'm sorry, I couldn't generate a response.");
+      const response = await AiService.fetchResponse(currentHistory);
+      const text = response || "I'm sorry, I couldn't generate a response.";
+
+      setMessages(prev => [...prev, { role: 'bot', text }]);
+      setConversationHistory(prev => [...prev, {
+        role: 'model',
+        parts: [{ text }]
+      }]);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Error connecting to AI service.";
-      appendMessage('bot', message);
+      setMessages(prev => [...prev, { role: 'bot', text: message }]);
     } finally {
       setIsLoading(false);
     }
-  }, [appendMessage]);
+  }, []);
 
   /**
    * Sends a user prompt to the AI service and updates the chat history.
@@ -84,10 +80,19 @@ export const useAssistant = () => {
   const sendMessage = useCallback(async (userPrompt: string) => {
     if (!userPrompt.trim()) return;
 
-    appendMessage('user', userPrompt);
+    const newUserMessage: GeminiMessage = {
+      role: 'user',
+      parts: [{ text: userPrompt }]
+    };
+
+    const updatedHistory = [...conversationHistory, newUserMessage];
+
+    setMessages(prev => [...prev, { role: 'user', text: userPrompt }]);
+    setConversationHistory(updatedHistory);
     setIsLoading(true);
-    await processAiResponse(userPrompt);
-  }, [appendMessage, processAiResponse]);
+
+    await processAiResponse(updatedHistory);
+  }, [conversationHistory, processAiResponse]);
 
   return { messages, isLoading, sendMessage };
 };
