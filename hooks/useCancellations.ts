@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ExperticketConfig, CancellationRequest } from '../types';
 import ExperticketService from '../services/experticketService';
 
@@ -54,7 +54,7 @@ export const useCancellations = (config: ExperticketConfig) => {
    * @param saleId - The identifier of the sale to cancel.
    * @param reason - The numeric reason code for cancellation (e.g., from {@link CancellationReason}).
    * @param comments - Optional explanatory comments from the agent.
-   * @throws Error if the cancellation submission fails.
+   * @throws {@link Error} if the cancellation submission fails.
    */
   const submitCancellation = useCallback(async (saleId: string, reason: number, comments: string) => {
     try {

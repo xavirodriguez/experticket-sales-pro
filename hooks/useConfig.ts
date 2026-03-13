@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ExperticketConfig } from '../types';
 
 /**
@@ -15,9 +15,8 @@ const STORAGE_KEYS = {
 /**
  * Retrieves the initial configuration from localStorage or defaults.
  *
- * @returns The stored configuration or a default one.
+ * @returns The initial {@link ExperticketConfig} object from storage or defaults.
  * @internal
- * @returns The initial ExperticketConfig object.
  */
 const loadStoredConfig = (): ExperticketConfig => ({
   partnerId: localStorage.getItem(STORAGE_KEYS.PARTNER_ID) || '',
