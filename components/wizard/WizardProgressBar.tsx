@@ -2,16 +2,41 @@
 import React, { useMemo } from 'react';
 import { CheckCircle2, Ticket, Calendar, UserCheck, CreditCard } from 'lucide-react';
 
+/**
+ * Internal representation of a wizard step.
+ * @internal
+ */
 interface Step {
+  /** The unique numeric identifier of the step. */
   id: number;
+  /** The display name of the step. */
   name: string;
+  /** The icon component to display for the step. */
   icon: React.ElementType;
 }
 
+/**
+ * Props for the {@link WizardProgressBar} component.
+ */
 interface WizardProgressBarProps {
+  /** The current active step in the wizard (1-indexed). */
   currentStep: number;
 }
 
+/**
+ * Renders a progress bar indicating the current step in the sale wizard.
+ *
+ * @remarks
+ * This component displays a series of steps with icons and labels,
+ * highlighting the active step and marking previous steps as completed.
+ *
+ * @param props - Component props.
+ *
+ * @example
+ * ```tsx
+ * <WizardProgressBar currentStep={2} />
+ * ```
+ */
 const WizardProgressBar: React.FC<WizardProgressBarProps> = ({ currentStep }) => {
   const steps: Step[] = useMemo(() => [
     { id: 1, name: 'Product', icon: Ticket },
