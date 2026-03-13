@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import NewSaleWizard from './components/NewSaleWizard';
@@ -35,7 +34,7 @@ const App: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-6">
             <div className="max-w-6xl mx-auto">
               <Routes>
-                <Route path="/" element={<DashboardView />} />
+                <Route path="/" element={<DashboardView config={config} />} />
                 <Route path="/new-sale" element={<NewSaleWizard config={config} />} />
                 <Route path="/transactions" element={<TransactionManager config={config} />} />
                 <Route path="/documents" element={<DocumentsPanel config={config} />} />

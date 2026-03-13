@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 
 interface ReservationStepProps {
@@ -9,17 +9,29 @@ interface ReservationStepProps {
 
 const ReservationStep: React.FC<ReservationStepProps> = ({ reservationId, reservationExpiry }) => {
   const [secondsLeft, setSecondsLeft] = useState(reservationExpiry * 60);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   useEffect(() => {
-    if (secondsLeft <= 0) return;
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setSecondsLeft(prev => prev - 1);
     }, 1000);
-    return () => clearInterval(interval);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (secondsLeft <= 0 && intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
+    }
   }, [secondsLeft]);
 
-  const minutes = Math.floor(secondsLeft / 60);
-  const seconds = secondsLeft % 60;
+  const minutes = Math.floor(Math.max(0, secondsLeft) / 60);
+  const seconds = Math.max(0, secondsLeft) % 60;
   const isUrgent = secondsLeft < 60 && secondsLeft > 0;
   const isExpired = secondsLeft <= 0;
 
