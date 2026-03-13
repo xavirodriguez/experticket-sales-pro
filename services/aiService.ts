@@ -15,85 +15,6 @@ export interface GeminiMessage {
 }
 
 /**
- * Retrieves the AI API key from environment variables.
- * @internal
- * @returns The configured API key.
- * @throws Error if no API key is found in the environment.
- */
-const getApiKey = (): string => {
-  const metaEnv = (import.meta as unknown as { env: Record<string, string> }).env;
-  const apiKey = metaEnv?.VITE_AI_API_KEY ||
-                 (process.env as Record<string, string | undefined>)?.AI_API_KEY ||
-                 (process.env as Record<string, string | undefined>)?.API_KEY;
-
-  if (!apiKey) {
-    throw new Error("AI API Key is not configured in environment variables");
-  }
-  return apiKey;
-};
-
-/**
- * Builds the API URL for the Gemini service.
- * @internal
- * @param apiKey - The API key to include in the URL.
- * @returns The complete API endpoint URL.
- */
-const buildApiUrl = (apiKey: string): string =>
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-/**
- * Creates the request payload for the Gemini API.
- * @internal
- * @param history - The conversation history.
- * @returns The JSON-serializable payload object.
- */
-const createPayload = (history: GeminiMessage[]) => ({
-  contents: history,
-  system_instruction: {
-    parts: [{ text: SYSTEM_INSTRUCTION }]
-  }
-});
-
-/**
- * Extracts the text content from the Gemini API response.
- * @internal
- * @param data - The parsed JSON response from the API.
- * @returns The extracted text content.
- * @throws Error if the response format is invalid.
- */
-const extractTextFromResponse = (data: unknown): string => {
-  const response = data as {
-    candidates?: {
-      content?: {
-        parts?: { text?: string }[];
-      };
-    }[];
-  };
-
-  const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new Error("Invalid response format from AI service");
-  }
-  return text;
-};
-
-/**
- * Handles the raw API response and extracts the data.
- * @internal
- * @param response - The Fetch API Response object.
- * @returns A promise that resolves to the response text.
- */
-const handleApiResponse = async (response: Response): Promise<string> => {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || `AI service request failed with status ${response.status}`);
-  }
-
-  const data = await response.json();
-  return extractTextFromResponse(data);
-};
-
-/**
  * Interacts with the AI model for sales assistance via REST API.
  *
  * @remarks
@@ -116,18 +37,70 @@ export const AiService = {
    * console.log(response);
    * ```
    */
-  fetchResponse: async (history: GeminiMessage[]): Promise<string> => {
+  async fetchResponse(history: GeminiMessage[]): Promise<string> {
     const apiKey = getApiKey();
-    const url = buildApiUrl(apiKey);
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(createPayload(history))
+      body: JSON.stringify({
+        contents: history,
+        system_instruction: {
+          parts: [{ text: SYSTEM_INSTRUCTION }]
+        }
+      })
     });
 
-    return handleApiResponse(response);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `AI service request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return extractTextFromResponse(data);
   }
 };
+
+/**
+ * Extracts the text content from the Gemini API response.
+ * @internal
+ * @param data - The parsed JSON response from the API.
+ * @returns The extracted text content.
+ * @throws Error if the response format is invalid.
+ */
+function extractTextFromResponse(data: unknown): string {
+  const response = data as {
+    candidates?: {
+      content?: {
+        parts?: { text?: string }[];
+      };
+    }[];
+  };
+
+  const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new Error("Invalid response format from AI service");
+  }
+  return text;
+}
+
+/**
+ * Retrieves the AI API key from environment variables.
+ * @internal
+ * @returns The configured API key.
+ * @throws Error if no API key is found in the environment.
+ */
+function getApiKey(): string {
+  const metaEnv = (import.meta as unknown as { env: Record<string, string> }).env;
+  const apiKey = metaEnv?.VITE_AI_API_KEY ||
+                 (process.env as Record<string, string | undefined>)?.AI_API_KEY ||
+                 (process.env as Record<string, string | undefined>)?.API_KEY;
+
+  if (!apiKey) {
+    throw new Error("AI API Key is not configured in environment variables");
+  }
+  return apiKey;
+}
