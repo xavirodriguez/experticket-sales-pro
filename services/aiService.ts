@@ -1,4 +1,3 @@
-
 /**
  * System instruction to guide the AI assistant's persona and behavior.
  * @internal
