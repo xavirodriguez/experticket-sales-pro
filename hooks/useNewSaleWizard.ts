@@ -1,5 +1,5 @@
 
-import React, { useMemo, useCallback } from 'react';
+import { useMemo } from 'react';
 import { ExperticketConfig, Product } from '../types';
 import ExperticketService from '../services/experticketService';
 import { useWizardData } from './useWizardData';

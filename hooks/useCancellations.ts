@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ExperticketConfig, CancellationRequest, CancellationSubmissionParams } from '../types';
 import ExperticketService from '../services/experticketService';
 

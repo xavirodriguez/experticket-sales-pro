@@ -1,41 +1,50 @@
-import pluginReact from "eslint-plugin-react";
-import pluginReactHooks from "eslint-plugin-react-hooks";
-import tseslint from "typescript-eslint";
+import js from "@eslint/js";
+import tsParser from "@typescript-eslint/parser";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import reactPlugin from "eslint-plugin-react";
+import hooksPlugin from "eslint-plugin-react-hooks";
+import prettierConfig from "eslint-config-prettier";
 import globals from "globals";
 
-export default tseslint.config(
+export default [
+  {
+    ignores: ["dist/**", "node_modules/**"],
+  },
+  js.configs.recommended,
   {
     files: ["**/*.{ts,tsx}"],
-    extends: [
-      ...tseslint.configs.recommended,
-    ],
     languageOptions: {
-      parser: tseslint.parser,
+      parser: tsParser,
       parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
         project: "./tsconfig.json",
       },
       globals: {
         ...globals.browser,
-        ...globals.es2021,
+        ...globals.node,
       },
     },
     plugins: {
-      "react": pluginReact,
-      "react-hooks": pluginReactHooks,
+      "@typescript-eslint": tsPlugin,
+      react: reactPlugin,
+      "react-hooks": hooksPlugin,
     },
     rules: {
-      ...pluginReact.configs.recommended.rules,
-      ...pluginReactHooks.configs.recommended.rules,
-      "react/react-in-jsx-scope": "off",
-      "@typescript-eslint/no-explicit-any": "error",
+      ...tsPlugin.configs.recommended.rules,
+      ...tsPlugin.configs.strict.rules,
+      ...reactPlugin.configs.recommended.rules,
+      ...reactPlugin.configs["jsx-runtime"].rules,
+      "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "error",
+      "@typescript-eslint/no-explicit-any": "error",
       "no-restricted-syntax": [
         "error",
         {
-          "selector": "TSAsExpression[typeAnnotation.type='TSAnyKeyword']",
-          "message": "Do not use 'as any'. Use 'as unknown' instead."
-        }
-      ]
+          selector: "TSAsExpression[typeAnnotation.type='TSAnyKeyword']",
+          message: "Do not use 'as any'. Use 'as unknown' instead.",
+        },
+      ],
     },
     settings: {
       react: {
@@ -43,4 +52,5 @@ export default tseslint.config(
       },
     },
   },
-);
+  prettierConfig,
+];
