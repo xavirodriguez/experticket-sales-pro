@@ -1,5 +1,6 @@
 
-import React, { useCallback } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ExperticketConfig } from '../types';
 import { useNewSaleWizard } from '../hooks/useNewSaleWizard';
 import WizardProgressBar from './wizard/WizardProgressBar';
@@ -33,6 +34,7 @@ interface NewSaleWizardProps {
  * ```
  */
 const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
+  const navigate = useNavigate();
   const {
     state,
     loading,
@@ -49,9 +51,9 @@ const NewSaleWizard: React.FC<NewSaleWizardProps> = ({ config }) => {
   const isCapacityBlocked = state.step === 2 &&
     capacityInfo?.Products?.[0]?.AvailableCapacity === 0;
 
-  const handleViewTransactions = useCallback(() => {
-    window.location.hash = '/transactions';
-  }, []);
+  const handleViewTransactions = () => {
+    navigate('/transactions');
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

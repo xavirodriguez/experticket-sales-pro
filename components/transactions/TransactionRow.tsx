@@ -37,7 +37,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({ transaction }) => {
       />
       <AmountCell amount={amount} />
       <StatusCell success={transaction.Success} />
-      <ActionCell />
+      <ActionCell transactionId={transaction.TransactionId} />
     </tr>
   );
 };

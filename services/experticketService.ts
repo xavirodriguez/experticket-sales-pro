@@ -55,6 +55,8 @@ interface RequestConfig {
   options?: RequestInit;
   /** Query parameters to append to the URL. */
   params?: Record<string, string | number>;
+  /** Optional API key to be sent in the X-Api-Key header. */
+  apiKey?: string;
 }
 
 /**
@@ -245,8 +247,8 @@ class ExperticketService {
   async getTransactions(searchParams: TransactionSearchParams = {}): Promise<TransactionsResponse> {
     return this.request<TransactionsResponse>({
       endpoint: '/transaction',
+      apiKey: this.config.apiKey,
       params: {
-        ApiKey: this.config.apiKey,
         ...(searchParams as Record<string, string | number>)
       }
     });
@@ -267,8 +269,8 @@ class ExperticketService {
   async getCancellationRequests(searchParams: CancellationSearchParams = {}): Promise<CancellationRequestsResponse> {
     return this.request<CancellationRequestsResponse>({
       endpoint: '/cancellationrequest',
+      apiKey: this.config.apiKey,
       params: {
-        ApiKey: this.config.apiKey,
         ...(searchParams as Record<string, string | number>)
       }
     });
@@ -313,8 +315,8 @@ class ExperticketService {
   async getTransactionDocuments(transactionId: string): Promise<TransactionDocumentsResponse> {
     return this.request<TransactionDocumentsResponse>({
       endpoint: '/transactiondocuments',
+      apiKey: this.config.apiKey,
       params: {
-        ApiKey: this.config.apiKey,
         id: transactionId,
         IncludeTransactionDocumentsLanguages: INCLUDE_PRICES_TRUE
       }
@@ -331,11 +333,11 @@ class ExperticketService {
   private async post<T extends ApiResponse>(endpoint: string, body: object): Promise<T> {
     return this.request<T>({
       endpoint,
+      apiKey: this.config.apiKey,
       options: {
         method: 'POST',
         body: JSON.stringify({
           ...body,
-          ApiKey: this.config.apiKey,
           IsTest: this.config.isTest
         })
       }
@@ -350,9 +352,9 @@ class ExperticketService {
    */
   private async request<T extends ApiResponse>(config: RequestConfig): Promise<T> {
     try {
-      const { endpoint, options = {}, params = {} } = config;
+      const { endpoint, options = {}, params = {}, apiKey } = config;
       const url = this.buildUrl(endpoint, params);
-      const response = await this.executeFetch(url, options);
+      const response = await this.executeFetch(url, options, apiKey);
       const data = await this.parseResponse<T>(response);
 
       this.validateResponse(data, response);
@@ -382,14 +384,20 @@ class ExperticketService {
    * @internal
    * @param url - The target URL.
    * @param options - The fetch options.
+   * @param apiKey - Optional API key for X-Api-Key header.
    * @returns A promise that resolves to the fetch Response.
    */
-  private async executeFetch(url: URL, options: RequestInit): Promise<Response> {
-    const headers = {
+  private async executeFetch(url: URL, options: RequestInit, apiKey?: string): Promise<Response> {
+    const headers: Record<string, string> = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...((options.headers as Record<string, string>) || {}),
     };
+
+    if (apiKey) {
+      headers['X-Api-Key'] = apiKey;
+    }
+
     return fetch(url.toString(), { ...options, headers });
   }
 
