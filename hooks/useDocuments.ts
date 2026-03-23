@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useCallback } from 'react';
 import { ExperticketConfig, TransactionDocument } from '../types';
 import ExperticketService from '../services/experticketService';
@@ -43,6 +44,7 @@ export const useDocuments = (config: ExperticketConfig) => {
    * Fetches document links (e.g., tickets) for the given transaction identifier.
    *
    * @param transactionId - The unique identifier of the transaction.
+   * @returns A promise that resolves when the documents are fetched.
    */
   const fetchDocuments = useCallback(async (transactionId: string) => {
     if (!transactionId) return;

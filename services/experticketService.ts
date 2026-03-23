@@ -71,7 +71,7 @@ interface RequestConfig {
  */
 class ExperticketService {
   /**
-   * Creates an instance of ExperticketService.
+   * Initializes a new instance of the {@link ExperticketService} class.
    * @param config - The configuration settings for the API client.
    */
   constructor(private readonly config: ExperticketConfig) {}
@@ -165,7 +165,7 @@ class ExperticketService {
    * Retrieves real-time pricing for products within a date range.
    *
    * @param searchParams - The search criteria including product IDs and date range.
-   * @returns A promise that resolves to the real-time price response.
+   * @returns A promise that resolves to the {@link RealTimePriceResponse}.
    * @throws {@link ExperticketApiError} If the network request fails or the API returns an error.
    *
    * @example

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { ExperticketConfig } from '../types';
 
@@ -14,10 +15,7 @@ const STORAGE_KEYS = {
 /**
  * Retrieves the initial configuration from localStorage or defaults.
  *
- * @remarks
- * The API key is intentionally not retrieved from localStorage to prevent XSS exposure.
- *
- * @returns The stored configuration or a default one.
+ * @returns The initial {@link ExperticketConfig} object from storage or defaults.
  * @internal
  */
 const loadStoredConfig = (): ExperticketConfig => ({

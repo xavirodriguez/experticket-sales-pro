@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { Provider, CatalogResponse } from '../types';
 import ExperticketService from '../services/experticketService';
@@ -29,7 +30,7 @@ export const useWizardData = ({ experticketService, onExecuteAction }: WizardDat
 
   /**
    * Loads both providers and the product catalog in parallel.
-   * @throws Error if any API call fails.
+   * @throws {@link Error} if any API call fails.
    */
   const loadInitialData = useCallback(async () => {
     const [providersResponse, catalogResponse] = await Promise.all([

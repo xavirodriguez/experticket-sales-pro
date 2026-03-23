@@ -172,7 +172,7 @@ export interface CapacitySession {
 export interface CapacityResponse extends ApiResponse {
   /**
    * Product base availability summaries.
-   * @internal Use {@link CapacityResponse.Products} for specific product checks.
+   * @internal Use {@link CapacityResponse#Products} for specific product checks.
    */
   ProductBases: unknown[];
   /** Detailed availability for individual products. */
@@ -243,6 +243,8 @@ export interface ReservationCreationParams {
 /**
  * Request payload for creating a new reservation.
  * @internal
+ * @remarks
+ * This interface represents the JSON body sent to the Experticket API.
  */
 export interface ReservationRequest {
   /** API key for authentication. */
@@ -261,7 +263,7 @@ export interface ReservationRequest {
  * Response containing details of a created reservation.
  *
  * @remarks
- * A reservation holds capacity for a limited time until it is confirmed by a transaction.
+ * A reservation holds capacity for a limited time until it is confirmed by a {@link Transaction}.
  */
 export interface ReservationResponse extends ApiResponse {
   /** Unique identifier for the reservation. */

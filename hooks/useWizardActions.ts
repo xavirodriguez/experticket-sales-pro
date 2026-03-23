@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { SaleWizardState, CapacityResponse } from '../types';
 import ExperticketService from '../services/experticketService';
@@ -31,7 +32,7 @@ export const useWizardActions = ({ experticketService, state, updateState }: Wiz
 
   /**
    * Handles product selection and checks availability.
-   * @throws Error if no product is selected.
+   * @throws {@link Error} if no product is selected.
    */
   const handleProductSelection = useCallback(async () => {
     if (!state.selectedProductId) throw new Error('Please select a product');

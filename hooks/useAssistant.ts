@@ -1,5 +1,6 @@
+
 import { useState, useCallback } from 'react';
-import { AiService, GeminiMessage } from '../services/aiService';
+import { AiService } from '../services/aiService';
 
 /**
  * Represents a single message in the assistant chat history.
